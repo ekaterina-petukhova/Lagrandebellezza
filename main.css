@@ -1,0 +1,1395 @@
+/* ============================================================
+   LA GRANDE BELLEZZA — Paolo Sorrentino
+   A single-experience "labyrinth" site.
+   Order of this stylesheet:
+     1. Reset & design tokens
+     2. Typography helpers
+     3. Navbar (dark strip + colosseum logo)
+     4. Burger / side menu (the labyrinth)
+     5. Step indicator
+     6. Buttons
+     7. Screen system & transitions
+     8. Screen 1 — Home (hero + quote)
+     9. Screen 2 — Intro (crack / glass shatter)
+    10. Location screens
+    11. City map
+    12. Modals (About / Documentation)
+    13. Footer
+    14. Reveal-on-view + misc
+    15. Responsive
+   ============================================================ */
+
+/* ---------- 1. Reset & design tokens ---------- */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #08070a;
+    --bg-soft: #100e14;
+    --ink: #ece8df;
+    --muted: #968f84;
+    --gold: #fecc2a;
+    --blue: #40c7f8;
+    --line: rgba(255, 255, 255, 0.12);
+    --nav-h: 112px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --serif: 'Playfair Display', Georgia, serif;
+    --body: 'Cormorant Garamond', Georgia, serif;
+    --mono: 'Courier New', ui-monospace, monospace;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--body);
+    background-color: var(--bg);
+    color: var(--ink);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ---------- 2. Typography helpers ---------- */
+.kicker {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.42em;
+    font-size: 0.72rem;
+    color: var(--gold);
+    opacity: 0.85;
+}
+
+.serif {
+    font-family: var(--serif);
+}
+
+/* ============================================================
+   3. NAVBAR — dark strip, links left, colosseum logo right
+   ============================================================ */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 36px 0 96px;            /* left room for the burger */
+    background: rgba(8, 7, 10, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+    z-index: 40;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 46px;
+    align-items: center;
+}
+
+.nav-links a,
+.nav-links button {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 1rem;
+    color: var(--ink);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 8px 0;
+    position: relative;
+    transition: color 0.35s var(--ease);
+}
+
+/* the "Narratives" entry gets a quiet gold accent so it reads as the new page */
+.nav-links .nav-narr {
+    color: var(--gold);
+}
+
+/* animated underline */
+.nav-links a::after,
+.nav-links button::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gold);
+    transition: width 0.4s var(--ease);
+}
+
+.nav-links a:hover,
+.nav-links button:hover {
+    color: var(--gold);
+}
+
+.nav-links a:hover::after,
+.nav-links button:hover::after {
+    width: 100%;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+}
+
+.nav-logo img {
+    width: 75px;
+    height: 65px;
+    object-fit: contain;
+    transition: transform 0.6s var(--ease), filter 0.6s var(--ease);
+    filter: drop-shadow(0 0 0 rgba(254, 204, 42, 0));
+}
+
+.nav-logo:hover img {
+    transform: rotate(-4deg) scale(1.06);
+    filter: drop-shadow(0 4px 16px rgba(254, 204, 42, 0.35));
+}
+
+/* ============================================================
+   4. BURGER / SIDE MENU — the labyrinth
+   ============================================================ */
+.menu-btn {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 64px;
+    height: var(--nav-h);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    z-index: 60;
+}
+
+.menu-btn span {
+    display: block;
+    width: 26px;
+    height: 2px;
+    background: var(--gold);
+    transition: transform 0.4s var(--ease), opacity 0.3s var(--ease);
+}
+
+body.menu-open .menu-btn span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+body.menu-open .menu-btn span:nth-child(2) {
+    opacity: 0;
+}
+
+body.menu-open .menu-btn span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: min(420px, 86vw);
+    background: linear-gradient(160deg, #0c0b10 0%, #07060a 100%);
+    border-right: 1px solid var(--line);
+    transform: translateX(-100%);
+    transition: transform 0.6s var(--ease);
+    z-index: 55;
+    padding: calc(var(--nav-h) + 30px) 0 40px;
+    overflow-y: auto;
+}
+
+body.menu-open .side-menu {
+    transform: translateX(0);
+}
+
+.side-menu .menu-label {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    font-size: 0.68rem;
+    color: var(--muted);
+    padding: 0 44px 14px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    padding: 16px 44px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+    transition: background 0.35s var(--ease), padding-left 0.35s var(--ease);
+}
+
+.menu-item:last-of-type {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.menu-item:hover {
+    background: rgba(254, 204, 42, 0.06);
+    padding-left: 54px;
+}
+
+.menu-item .num {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    flex: none;
+    width: 28px;
+}
+
+.menu-item .name {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    line-height: 1.15;
+    color: var(--ink);
+}
+
+.menu-item.active .name {
+    color: var(--gold);
+}
+
+.side-scrim {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s var(--ease), visibility 0.5s var(--ease);
+    z-index: 50;
+}
+
+body.menu-open .side-scrim {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ============================================================
+   5. STEP INDICATOR — "where in the labyrinth am I"
+   ============================================================ */
+.step-indicator {
+    position: fixed;
+    left: 50%;
+    bottom: 26px;
+    transform: translateX(-50%) translateY(20px);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 22px;
+    background: rgba(8, 7, 10, 0.7);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s var(--ease), transform 0.5s var(--ease);
+    z-index: 45;
+}
+
+.step-indicator.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* tuck the pill away when the footer is reached */
+.step-indicator.near-footer {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+}
+
+.step-indicator .dots {
+    display: flex;
+    gap: 9px;
+}
+
+.step-indicator .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    transition: background 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+.step-indicator .dot.on {
+    background: var(--gold);
+    transform: scale(1.35);
+}
+
+.step-indicator .label {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+/* ============================================================
+   6. BUTTONS
+   ============================================================ */
+.btn {
+    --c: var(--gold);
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.76rem;
+    color: var(--c);
+    background: transparent;
+    border: 1px solid var(--c);
+    padding: 16px 30px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.45s var(--ease);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--c);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease);
+    z-index: -1;
+}
+
+.btn:hover {
+    color: #07060a;
+}
+
+.btn:hover::before {
+    transform: scaleX(1);
+}
+
+.btn .arrow {
+    transition: transform 0.45s var(--ease);
+}
+
+.btn:hover .arrow {
+    transform: translateX(5px);
+}
+
+.btn-blue {
+    --c: var(--blue);
+}
+
+/* ============================================================
+   7. SCREEN SYSTEM & TRANSITIONS
+   ============================================================ */
+.screen {
+    display: none;
+    min-height: 100vh;
+    position: relative;
+}
+
+.screen.active {
+    display: block;
+    animation: screenIn 0.85s var(--ease) both;
+}
+
+@keyframes screenIn {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+        filter: blur(6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+        filter: blur(0);
+    }
+}
+
+/* ============================================================
+   8. SCREEN 1 — HOME (hero + quote)
+   ============================================================ */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    background: url('images/mainpage.jpg') no-repeat center center / cover;
+    padding: calc(var(--nav-h) + 30px) 20px 90px;
+}
+
+.hero .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.35) 40%, rgba(0, 0, 0, 0.7) 100%);
+    z-index: 0;
+}
+
+.hero-content {
+    z-index: 1;
+    text-align: center;
+    width: 100%;
+    margin-top: 40px;
+}
+
+.title {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 9vw, 8rem);
+    font-weight: 900;
+    color: var(--gold);
+    text-transform: uppercase;
+    line-height: 0.9;
+    margin-bottom: 16px;
+    text-shadow: 0 6px 40px rgba(0, 0, 0, 0.5);
+}
+
+.director {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 4vw, 3.4rem);
+    color: var(--blue);
+    letter-spacing: 0.25em;
+    font-weight: 400;
+    font-style: italic;
+}
+
+.quote-container {
+    z-index: 1;
+    position: relative;
+    margin: 70px auto 0;
+    padding: clamp(24px, 5vw, 60px);
+    width: 92%;
+    max-width: 1100px;
+    text-align: center;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.quote {
+    color: #e9ecef;
+    font-size: clamp(1.2rem, 2.4vw, 2rem);
+    font-style: italic;
+    line-height: 1.7;
+}
+
+.hero-enter {
+    z-index: 1;
+    margin-top: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+}
+
+.scroll-cue {
+    width: 1px;
+    height: 46px;
+    background: linear-gradient(var(--gold), transparent);
+    animation: cue 1.8s var(--ease) infinite;
+}
+
+@keyframes cue {
+    0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
+    40% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+    60% { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+    100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
+/* ============================================================
+   9. SCREEN 2 — INTRO (crack / glass shatter)
+   ============================================================ */
+#intro {
+    overflow: hidden;
+}
+
+.crack-stage {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.stage-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+}
+
+.stage-bg.before {
+    background-image: url('images/crack.jpg');
+}
+
+.stage-bg.after {
+    background-image: url('images/aftercrack.jpg');
+    opacity: 0;
+    transform: scale(1.08);
+    transition: opacity 1.1s var(--ease), transform 1.6s var(--ease);
+}
+
+.stage-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(4, 4, 8, 0.55);
+}
+
+.crack-stage.shattered .stage-bg.after {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* the procedurally drawn glass cracks live in this SVG */
+.crack-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+}
+
+.crack-stage.shattered .crack-svg {
+    opacity: 1;
+}
+
+/* once we land on the intact "after" screen, cracks dissolve away */
+.crack-stage.healed .crack-svg {
+    opacity: 0;
+}
+
+.crack-line {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.92);
+    stroke-width: 1.1;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6));
+}
+
+.flash {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    z-index: 8;
+    pointer-events: none;
+}
+
+.flash.go {
+    animation: flash 0.5s ease;
+}
+
+@keyframes flash {
+    0% { opacity: 0; }
+    8% { opacity: 0.85; }
+    100% { opacity: 0; }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    15% { transform: translate(-9px, 5px); }
+    30% { transform: translate(8px, -6px); }
+    45% { transform: translate(-7px, -4px); }
+    60% { transform: translate(6px, 5px); }
+    75% { transform: translate(-4px, 3px); }
+}
+
+.crack-stage.shake {
+    animation: shake 0.55s ease;
+}
+
+/* both texts share one centered grid cell so the stage never clips */
+.stage-inner {
+    position: relative;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    width: min(900px, 90vw);
+    padding: calc(var(--nav-h) + 30px) 0 60px;
+}
+
+.stage-inner > * {
+    grid-area: 1 / 1;
+}
+
+.stage-content {
+    text-align: center;
+    transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+
+.before-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 38px;
+}
+
+.crack-stage.shattered .before-content {
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+}
+
+.intro-quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.25rem, 2.4vw, 2.1rem);
+    line-height: 1.65;
+    color: #f2efe8;
+    text-shadow: 0 4px 28px rgba(0, 0, 0, 0.6);
+}
+
+.after-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 38px;
+    opacity: 0;
+    transform: translateY(26px);
+    pointer-events: none;
+}
+
+.crack-stage.healed .after-content {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+}
+
+.after-content .intro-quote {
+    max-width: 820px;
+}
+
+/* the minimalist hammer button */
+.hammer-btn {
+    --c: var(--gold);
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: var(--c);
+    padding: 10px;
+}
+
+.hammer-ico {
+    width: 54px;
+    height: 54px;
+    transition: transform 0.3s var(--ease);
+    transform-origin: 70% 70%;
+}
+
+.hammer-btn:hover .hammer-ico {
+    transform: rotate(-18deg);
+}
+
+.hammer-btn.swing .hammer-ico {
+    animation: swing 0.45s var(--ease);
+}
+
+@keyframes swing {
+    0% { transform: rotate(-42deg); }
+    55% { transform: rotate(14deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.hammer-btn .hammer-label {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    font-size: 0.72rem;
+    color: var(--ink);
+    transition: color 0.35s var(--ease);
+}
+
+.hammer-btn:hover .hammer-label {
+    color: var(--gold);
+}
+
+.hammer-ring {
+    position: absolute;
+    top: 4px;
+    width: 54px;
+    height: 54px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    opacity: 0;
+}
+
+.hammer-btn.swing .hammer-ring {
+    animation: ring 0.7s ease;
+}
+
+@keyframes ring {
+    0% { transform: scale(0.6); opacity: 0.7; }
+    100% { transform: scale(2.6); opacity: 0; }
+}
+
+.labyrinth-btn {
+    max-width: 640px;
+    text-align: center;
+    line-height: 1.5;
+    text-transform: none;
+    letter-spacing: 0.08em;
+    font-size: 0.95rem;
+    font-family: var(--body);
+}
+
+/* ============================================================
+   10. LOCATION SCREENS
+   ============================================================ */
+.location {
+    padding: calc(var(--nav-h) + 40px) 0 0;
+}
+
+.loc-hero {
+    position: relative;
+    height: 78vh;
+    min-height: 460px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+}
+
+.loc-hero .loc-img {
+    position: absolute;
+    inset: -8%;
+    width: 116%;
+    max-width: none;
+    height: 116%;
+    object-fit: cover;
+    will-change: transform;
+}
+
+.loc-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(8, 7, 10, 0.15) 0%, rgba(8, 7, 10, 0.2) 50%, rgba(8, 7, 10, 0.95) 100%);
+}
+
+.loc-hero-text {
+    position: relative;
+    z-index: 2;
+    padding: 0 clamp(24px, 7vw, 110px) 56px;
+    width: 100%;
+}
+
+.loc-hero-text .kicker {
+    display: block;
+    margin-bottom: 18px;
+}
+
+.loc-title {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 6vw, 5.4rem);
+    line-height: 0.98;
+    color: var(--ink);
+    max-width: 16ch;
+    text-shadow: 0 6px 40px rgba(0, 0, 0, 0.6);
+}
+
+.loc-body {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(50px, 8vw, 100px) clamp(24px, 7vw, 60px);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+}
+
+.loc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px 60px;
+    padding-bottom: 36px;
+    border-bottom: 1px solid var(--line);
+}
+
+.meta-item .meta-k {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.64rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.meta-item .meta-v {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    color: var(--gold);
+}
+
+.loc-prose p {
+    font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+    line-height: 1.75;
+    color: #d8d3c8;
+    margin-bottom: 1.4em;
+}
+
+.loc-prose p .lead {
+    color: var(--ink);
+}
+
+.loc-prose .firstcap::first-letter {
+    font-family: var(--serif);
+    font-size: 3.4em;
+    float: left;
+    line-height: 0.78;
+    padding: 6px 12px 0 0;
+    color: var(--gold);
+}
+
+/* secondary image(s) for locations that have a pair */
+.loc-gallery {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: 1fr 1fr;
+    margin-top: 10px;
+}
+
+.loc-gallery.single {
+    grid-template-columns: 1fr;
+}
+
+.loc-gallery figure {
+    overflow: hidden;
+    position: relative;
+}
+
+.loc-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    aspect-ratio: 4 / 3;
+    transition: transform 0.9s var(--ease);
+}
+
+.loc-gallery figure:hover img {
+    transform: scale(1.05);
+}
+
+.loc-gallery figcaption {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    width: 100%;
+}
+
+/* prev / next labyrinth navigation */
+.loc-nav {
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.loc-nav a {
+    padding: 40px clamp(24px, 7vw, 60px);
+    cursor: pointer;
+    transition: background 0.4s var(--ease);
+}
+
+.loc-nav a:hover {
+    background: rgba(254, 204, 42, 0.05);
+}
+
+.loc-nav a:first-child {
+    border-right: 1px solid var(--line);
+}
+
+.loc-nav a.next {
+    text-align: right;
+}
+
+.loc-nav .dir {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.24em;
+    font-size: 0.66rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: block;
+}
+
+.loc-nav .dest {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    color: var(--ink);
+    transition: color 0.4s var(--ease);
+}
+
+.loc-nav a:hover .dest {
+    color: var(--gold);
+}
+
+/* ============================================================
+   11. CITY MAP
+   ============================================================ */
+#citymap {
+    padding: calc(var(--nav-h) + 70px) clamp(24px, 7vw, 80px) 90px;
+}
+
+.map-head {
+    text-align: center;
+    max-width: 760px;
+    margin: 0 auto 60px;
+}
+
+.map-head h2 {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    margin: 16px 0;
+    color: var(--ink);
+}
+
+.map-head p {
+    font-size: 1.2rem;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.map-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3 / 4;
+    cursor: pointer;
+    border: 1px solid var(--line);
+}
+
+.map-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.9s var(--ease), filter 0.6s var(--ease);
+    filter: grayscale(0.4) brightness(0.7);
+}
+
+.map-card:hover img {
+    transform: scale(1.08);
+    filter: grayscale(0) brightness(0.85);
+}
+
+.map-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(transparent 40%, rgba(8, 7, 10, 0.92));
+}
+
+.map-card .map-info {
+    position: absolute;
+    z-index: 2;
+    bottom: 0;
+    padding: 22px;
+}
+
+.map-card .map-info .num {
+    font-family: var(--mono);
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+}
+
+.map-card .map-info .nm {
+    font-family: var(--serif);
+    font-size: 1.45rem;
+    line-height: 1.1;
+    margin-top: 8px;
+    color: var(--ink);
+}
+
+/* ============================================================
+   11b. NARRATIVES — reading Rome by theme, type & century
+   ============================================================ */
+.narratives {
+    padding: calc(var(--nav-h) + 70px) clamp(24px, 7vw, 80px) 90px;
+}
+
+.narr-head {
+    text-align: center;
+    max-width: 820px;
+    margin: 0 auto 60px;
+}
+
+.narr-head h2 {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    margin: 16px 0;
+    color: var(--ink);
+}
+
+.narr-head p {
+    font-size: 1.2rem;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* each "lens" is one way of reading the locations */
+.lens {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 50px 0;
+    border-top: 1px solid var(--line);
+}
+
+.lens:first-of-type {
+    border-top: 0;
+}
+
+.lens-kicker {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.4em;
+    font-size: 0.72rem;
+    color: var(--gold);
+}
+
+.lens--period .lens-kicker {
+    color: var(--blue);
+}
+
+.lens-title {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 2.8vw, 2.3rem);
+    line-height: 1.2;
+    color: var(--ink);
+    margin: 14px 0 32px;
+    max-width: 26ch;
+}
+
+.tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.narr-tag {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.8rem;
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--line);
+    padding: 15px 24px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+    transition: color 0.45s var(--ease), border-color 0.45s var(--ease);
+}
+
+.narr-tag::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease);
+    z-index: -1;
+}
+
+.lens--period .narr-tag::before {
+    background: var(--blue);
+}
+
+.narr-tag:hover {
+    color: #07060a;
+    border-color: var(--gold);
+}
+
+.lens--period .narr-tag:hover {
+    border-color: var(--blue);
+}
+
+.narr-tag:hover::before {
+    transform: scaleX(1);
+}
+
+/* the narrative modal's related-location chips */
+.narr-relations {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+}
+
+.rel-label {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    font-size: 0.66rem;
+    color: var(--muted);
+    margin-bottom: 16px !important;
+}
+
+.rel-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.rel-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--line);
+    padding: 11px 18px;
+    cursor: pointer;
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    color: var(--ink);
+    transition: color 0.35s var(--ease), border-color 0.35s var(--ease), background 0.35s var(--ease);
+}
+
+.rel-chip:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: rgba(254, 204, 42, 0.06);
+}
+
+.rel-chip .rc-num {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+}
+
+.narr-lens-tag {
+    color: var(--gold);
+    margin-bottom: 12px;
+}
+
+/* ============================================================
+   12. MODALS (About / Documentation)
+   ============================================================ */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s var(--ease), visibility 0.5s var(--ease);
+}
+
+.modal.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+}
+
+.modal-box {
+    position: relative;
+    z-index: 1;
+    width: min(680px, 100%);
+    max-height: 86vh;
+    overflow-y: auto;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    padding: clamp(30px, 5vw, 56px);
+    transform: translateY(20px);
+    transition: transform 0.6s var(--ease);
+}
+
+.modal.open .modal-box {
+    transform: none;
+}
+
+.modal-box h3 {
+    font-family: var(--serif);
+    font-size: 2rem;
+    color: var(--gold);
+    margin-bottom: 20px;
+}
+
+.modal-box p {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: #cfc9bd;
+    margin-bottom: 1.1em;
+}
+
+.modal-close {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s var(--ease);
+}
+
+.modal-close:hover {
+    color: var(--gold);
+}
+
+/* ============================================================
+   13. FOOTER
+   ============================================================ */
+.site-footer {
+    border-top: 1px solid var(--line);
+    padding: 48px clamp(24px, 7vw, 80px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: center;
+    background: #060509;
+}
+
+.site-footer .f-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--ink);
+}
+
+.site-footer .f-meta {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* ============================================================
+   14. REVEAL-ON-VIEW + misc
+   ============================================================ */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+}
+
+.reveal.in {
+    opacity: 1;
+    transform: none;
+}
+
+/* tiny scroll progress bar at very top */
+.progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--gold);
+    z-index: 70;
+    transition: width 0.1s linear;
+}
+
+/* ============================================================
+   15. RESPONSIVE
+   ============================================================ */
+@media (max-width: 760px) {
+    :root {
+        --nav-h: 84px;
+    }
+
+    .navbar {
+        padding: 0 16px 0 64px;
+    }
+
+    .nav-links {
+        gap: 14px;
+    }
+
+    .nav-links a,
+    .nav-links button {
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+    }
+
+    .nav-logo img {
+        width: 60px;
+        height: 52px;
+    }
+
+    .loc-gallery,
+    .loc-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .loc-nav a:first-child {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .loc-nav a.next {
+        text-align: left;
+    }
+}
+
+@media (max-width: 460px) {
+    .nav-links {
+        gap: 12px;
+    }
+
+    .step-indicator .label {
+        display: none;
+    }
+}
