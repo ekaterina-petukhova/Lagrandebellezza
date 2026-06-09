@@ -36,7 +36,7 @@
     --gold: #fecc2a;
     --blue: #40c7f8;
     --line: rgba(255, 255, 255, 0.12);
-    --nav-h: 112px;
+    --nav-h: 142px;
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
     --serif: 'Playfair Display', Georgia, serif;
     --body: 'Cormorant Garamond', Georgia, serif;
@@ -172,8 +172,8 @@ a {
 }
 
 .nav-logo img {
-    width: 75px;
-    height: 65px;
+    width: 116px;
+    height: 100px;
     object-fit: contain;
     transition: transform 0.6s var(--ease), filter 0.6s var(--ease);
     filter: drop-shadow(0 0 0 rgba(254, 204, 42, 0));
@@ -1066,6 +1066,133 @@ body.menu-open .side-scrim {
     color: var(--ink);
 }
 
+/* ---------- Interactive Rome map (Leaflet) ---------- */
+.rome-map-frame {
+    max-width: 1200px;
+    margin: 0 auto 56px;
+    padding: 10px;
+    border: 1px solid var(--line);
+    background: #0b0a0e;
+}
+
+.rome-map {
+    height: clamp(380px, 58vh, 620px);
+    width: 100%;
+}
+
+.rome-map-note {
+    text-align: center;
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 0.64rem;
+    color: var(--muted);
+    padding: 14px 10px 6px;
+}
+
+/* keep our global img rule from breaking Leaflet tiles */
+.leaflet-container img.leaflet-tile,
+.leaflet-container .leaflet-pane img {
+    max-width: none !important;
+}
+
+.leaflet-container {
+    background: #0b0a0e;
+    font-family: var(--body);
+}
+
+/* gold numbered markers */
+.rome-marker {
+    background: transparent;
+    border: 0;
+}
+
+.rome-marker .rm-dot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: #07060a;
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: 0 0 0 4px rgba(254, 204, 42, 0.22), 0 4px 14px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+}
+
+.rome-marker:hover .rm-dot {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 7px rgba(254, 204, 42, 0.28), 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+/* the little hover card (Leaflet tooltip) */
+.leaflet-tooltip.rome-tip {
+    background: #0b0a0e;
+    border: 1px solid var(--gold);
+    border-radius: 0;
+    padding: 0;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6);
+    white-space: normal;
+}
+
+.leaflet-tooltip.rome-tip.leaflet-tooltip-top::before {
+    border-top-color: var(--gold);
+}
+
+.rome-tip-inner {
+    width: 210px;
+}
+
+.rome-tip-inner img {
+    width: 100%;
+    height: 124px;
+    object-fit: cover;
+    display: block;
+}
+
+.rome-tip-cap {
+    display: block;
+    padding: 11px 13px 13px;
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    line-height: 1.25;
+    color: var(--ink);
+}
+
+.rome-tip-cap b {
+    font-family: var(--mono);
+    color: var(--gold);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    margin-right: 7px;
+}
+
+/* dark zoom + attribution controls */
+.leaflet-bar a,
+.leaflet-bar a:hover {
+    background: #0b0a0e;
+    color: var(--gold);
+    border-bottom-color: var(--line);
+}
+
+.leaflet-bar a:hover {
+    background: #15131a;
+}
+
+.leaflet-control-attribution {
+    background: rgba(8, 7, 10, 0.7) !important;
+    color: var(--muted) !important;
+    font-size: 0.62rem;
+}
+
+.leaflet-control-attribution a {
+    color: var(--muted) !important;
+}
+
 /* ============================================================
    11b. NARRATIVES — reading Rome by theme, type & century
    ============================================================ */
@@ -1364,7 +1491,7 @@ body.menu-open .side-scrim {
    ============================================================ */
 @media (max-width: 760px) {
     :root {
-        --nav-h: 84px;
+        --nav-h: 100px;
     }
 
     .navbar {
@@ -1382,8 +1509,8 @@ body.menu-open .side-scrim {
     }
 
     .nav-logo img {
-        width: 60px;
-        height: 52px;
+        width: 84px;
+        height: 72px;
     }
 
     .loc-gallery,

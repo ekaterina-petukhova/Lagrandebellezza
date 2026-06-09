@@ -16,6 +16,15 @@
 const SCREENS = ['home', 'intro', 'loc1', 'loc2', 'loc3', 'loc4', 'loc5', 'narratives', 'citymap'];
 const LOCATIONS = ['loc1', 'loc2', 'loc3', 'loc4', 'loc5'];
 
+// real Rome coordinates + a representative photo for the City map
+const ROME_PLACES = [
+    { id: 'loc1', n: 1, name: 'The Janiculum Hill', img: 'images/1location2.png', lat: 41.8898, lng: 12.4615 },
+    { id: 'loc2', n: 2, name: "Jep's Terrace & the Colosseum", img: 'images/colosseo.jpg', lat: 41.8902, lng: 12.4922 },
+    { id: 'loc3', n: 3, name: 'The Aventine Hill', img: 'images/aventine.JPG', lat: 41.8836, lng: 12.4783 },
+    { id: 'loc4', n: 4, name: 'The Baths of Caracalla', img: 'images/caracalla.JPG', lat: 41.8790, lng: 12.4925 },
+    { id: 'loc5', n: 5, name: 'Palazzo Brancaccio', img: 'images/botox2.jpg', lat: 41.8954, lng: 12.5018 }
+];
+
 // display names used by the narrative modal's location chips
 const LOCATION_NAMES = {
     loc1: 'The Janiculum Hill',
@@ -178,6 +187,9 @@ function showScreen(id, instant) {
     updateStepIndicator(el);
     syncMenuActive(id);
     refreshReveals(el);
+
+    // the Rome map needs a visible, sized container to render
+    if (id === 'citymap') setTimeout(initRomeMap, 60);
 }
 
 function initRouter() {
@@ -502,6 +514,64 @@ function initFooterWatch() {
     new IntersectionObserver(entries => {
         indicator.classList.toggle('near-footer', entries[0].isIntersecting);
     }, { threshold: 0 }).observe(footer);
+}
+
+/* ---------- 8b. Interactive Rome map (Leaflet) ---------- */
+let romeMap = null;
+function initRomeMap() {
+    const el = document.getElementById('romeMap');
+    if (!el || typeof L === 'undefined') return;
+
+    // already built — just make sure it's sized correctly
+    if (romeMap) {
+        romeMap.invalidateSize();
+        return;
+    }
+
+    romeMap = L.map(el, {
+        scrollWheelZoom: false,   // let the page scroll naturally
+        zoomControl: true,
+        attributionControl: true
+    });
+
+    // dark, editorial basemap that matches the site
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    }).addTo(romeMap);
+
+    const markers = ROME_PLACES.map(p => {
+        const icon = L.divIcon({
+            className: 'rome-marker',
+            html: `<span class="rm-dot">${p.n}</span>`,
+            iconSize: [34, 34],
+            iconAnchor: [17, 17]
+        });
+        const marker = L.marker([p.lat, p.lng], { icon }).addTo(romeMap);
+
+        const num = String(p.n).padStart(2, '0');
+        marker.bindTooltip(
+            `<div class="rome-tip-inner">
+                <img src="${p.img}" alt="">
+                <span class="rome-tip-cap"><b>${num}</b>${p.name}</span>
+             </div>`,
+            { direction: 'top', offset: [0, -16], className: 'rome-tip', opacity: 1 }
+        );
+
+        marker.on('click', () => { showScreen(p.id); closeMenu(); });
+        return marker;
+    });
+
+    // frame all five places nicely
+    romeMap.fitBounds(L.featureGroup(markers).getBounds().pad(0.35));
+    setTimeout(() => romeMap.invalidateSize(), 200);
+
+    // keep the map correctly sized when the window changes
+    window.addEventListener('resize', () => {
+        if (romeMap && document.getElementById('citymap').classList.contains('active')) {
+            romeMap.invalidateSize();
+        }
+    });
 }
 
 /* ---------- 9. Parallax on location images ---------- */
