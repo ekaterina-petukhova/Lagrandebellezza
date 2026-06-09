@@ -126,6 +126,23 @@ a {
     color: var(--gold);
 }
 
+/* explicit "back to start" control, top-left by convention */
+.nav-links .nav-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.nav-links .nav-home .home-ico {
+    width: 17px;
+    height: 17px;
+    transition: transform 0.4s var(--ease);
+}
+
+.nav-links .nav-home:hover .home-ico {
+    transform: translateY(-2px);
+}
+
 /* animated underline */
 .nav-links a::after,
 .nav-links button::after {
