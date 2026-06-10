@@ -51,6 +51,7 @@
         <div class="menu-item" data-go="loc4"><span class="num">04</span><span class="name">The Baths of Caracalla</span></div>
         <div class="menu-item" data-go="loc5"><span class="num">05</span><span class="name">Palazzo Brancaccio</span></div>
         <div class="menu-item" data-go="citymap"><span class="num">✶</span><span class="name">City map</span></div>
+        <div class="menu-item" data-go="fighter"><span class="num">VS</span><span class="name">Choose your fighter</span></div>
     </aside>
     <div class="side-scrim" id="sideScrim"></div>
 
@@ -360,6 +361,66 @@
                     <img src="images/botox2.jpg" alt="Palazzo Brancaccio">
                     <div class="map-info"><div class="num">05</div><div class="nm">Palazzo Brancaccio</div></div>
                 </div>
+            </div>
+        </section>
+
+        <!-- ===== CHOOSE YOUR FIGHTER ===== -->
+        <section class="screen fighter" id="fighter">
+            <div class="fighter-head">
+                <p class="kicker reveal">Choose your fighter</p>
+                <h2 class="reveal">The people of Jep's Rome</h2>
+                <p class="reveal">A constellation around Jep Gambardella. Choose a face to read their bond with him, the scenes they live in, and the lines that linger. Then take the quiz and find out which one of them you are.</p>
+            </div>
+
+            <div class="fighter-graph reveal">
+                <!-- the constellation -->
+                <div class="constellation">
+                    <svg class="constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                        <line x1="50" y1="50" x2="50" y2="14"></line>
+                        <line x1="50" y1="50" x2="86" y2="50"></line>
+                        <line x1="50" y1="50" x2="50" y2="86"></line>
+                        <line x1="50" y1="50" x2="14" y2="50"></line>
+                    </svg>
+
+                    <button class="char-node center" data-char="jep" style="left:50%;top:50%">
+                        <span class="char-ava"><img src="images/quiz_Jep.jpg" alt="Jep Gambardella"></span>
+                        <span class="char-name">Jep</span>
+                    </button>
+                    <button class="char-node" data-char="ramona" style="left:50%;top:14%">
+                        <span class="char-ava"><img src="images/quiz_Ramona.jpg" alt="Ramona"></span>
+                        <span class="char-name">Ramona</span>
+                    </button>
+                    <button class="char-node" data-char="elisa" style="left:86%;top:50%">
+                        <span class="char-ava"><img src="images/quiz_Elisa.jpg" alt="Elisa"></span>
+                        <span class="char-name">Elisa</span>
+                    </button>
+                    <button class="char-node" data-char="maria" style="left:50%;top:86%">
+                        <span class="char-ava"><img src="images/quiz_Saint.jpg" alt="Sister Maria"></span>
+                        <span class="char-name">Sister Maria</span>
+                    </button>
+                    <button class="char-node" data-char="dadina" style="left:14%;top:50%">
+                        <span class="char-ava"><img src="images/quiz_Dadina.jpg" alt="Dadina"></span>
+                        <span class="char-name">Dadina</span>
+                    </button>
+                </div>
+
+                <!-- the detail panel (filled by main.js) -->
+                <div class="char-detail" id="charDetail"></div>
+            </div>
+
+            <!-- the quiz -->
+            <div class="quiz">
+                <div class="quiz-head">
+                    <p class="kicker reveal">The quiz</p>
+                    <h3 class="reveal">Who are you in <em>The Great Beauty</em>?</h3>
+                    <p class="quiz-sub reveal">Five questions, one Roman soul. Answer honestly — there are no wrong answers, only beautiful ones.</p>
+                </div>
+                <div id="quizQuestions"></div>
+                <div class="quiz-actions">
+                    <button id="quizReveal" class="btn" disabled>Reveal your character <span class="arrow">→</span></button>
+                    <span id="quizProgress" class="quiz-progress">0 / 5 answered</span>
+                </div>
+                <div id="quizResult" class="quiz-result" hidden></div>
             </div>
         </section>
 

@@ -13,7 +13,7 @@
    ============================================================ */
 
 /* ---------- 1. Boot ---------- */
-const SCREENS = ['home', 'intro', 'loc1', 'loc2', 'loc3', 'loc4', 'loc5', 'narratives', 'citymap'];
+const SCREENS = ['home', 'intro', 'loc1', 'loc2', 'loc3', 'loc4', 'loc5', 'narratives', 'citymap', 'fighter'];
 const LOCATIONS = ['loc1', 'loc2', 'loc3', 'loc4', 'loc5'];
 
 // real Rome coordinates + a representative photo for the City map
@@ -159,6 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initSideMenu();
     initModals();
     initNarratives();
+    initFighter();
+    initQuiz();
     initCrackExperience();
     initReveals();
     initProgress();
@@ -306,6 +308,263 @@ function openNarrative(key) {
     }).join('');
 
     document.getElementById('modal-narrative').classList.add('open');
+}
+
+/* ---------- 5c. Choose your fighter — character graph ---------- */
+const CHARACTERS = {
+    jep: {
+        name: 'Jep Gambardella',
+        role: 'The writer · the king of the high life',
+        img: 'images/quiz_Jep.jpg',
+        rel: "The still centre of it all. At sixty-five, Jep is a journalist and one-time novelist who long ago wrote a single, perfect book — and never another. He reigns over Rome's nightlife with irony and impeccable taste, while quietly searching for the great beauty he can no longer find.",
+        scenes: [
+            'His sixty-fifth birthday party on the terrace facing the Colosseum.',
+            'Wandering the sleeping city at dawn, past palaces and fountains.',
+            'The closing monologue, where the long search finally becomes a novel.'
+        ],
+        quotes: [
+            '“I was looking for the great beauty, but I didn’t find it.”',
+            '“I was destined for sensibility. I was destined to become a writer.”',
+            '“This is how it always ends. With death. But first, there was life.”'
+        ],
+        result: "You are a disillusioned aesthete. You've achieved everything socially, yet you keep searching for that one glimpse of real beauty amid the emptiness of small talk. Your strength is irony and impeccable taste."
+    },
+    ramona: {
+        name: 'Ramona',
+        role: 'The dancer · the honest one',
+        img: 'images/quiz_Ramona.jpg',
+        rel: "The daughter of an old friend, a forty-two-year-old dancer Jep takes under his wing. Theirs is the film's tenderest bond — unromantic, unguarded, true. She spends her money on a secret she carries quietly: she is dying.",
+        scenes: [
+            'Night walks through Rome and a private, after-hours viewing of a palazzo’s art.',
+            'Her performance, and the unexpected stillness Jep finds beside her.',
+            'The quiet revelation of her illness, and her death.'
+        ],
+        quotes: [
+            '“I’m forty-two years old and I’ve led a dissolute life.”',
+            '“I spend all my money. On what, I can’t tell you.”',
+            '(Jep, of her) “You’re nobody’s fool, Ramona.”'
+        ],
+        result: "You are a deep, sincere person hiding an inner fragility behind a weary surface. You value genuine intimacy over glitter, and you're not afraid to look the truth in the eye — even when it's sad."
+    },
+    dadina: {
+        name: 'Dadina',
+        role: "The editor · Jep's anchor",
+        img: 'images/quiz_Dadina.jpg',
+        rel: "Jep's editor-in-chief and fiercest friend. Sharp-tongued, clear-eyed and loyal, she keeps him working and keeps him honest. What she lacks in height she returns many times over in authority and warmth.",
+        scenes: [
+            'Editorial sparring in the magazine office.',
+            'Cutting through Jep’s poses with a single dry remark.',
+            'Standing by him, unglamorous and steadfast, through the long Roman nights.'
+        ],
+        quotes: [
+            '“Jep, write something. Anything.”',
+            '“We’re all disappointed — and still we keep each other company.”',
+            '“Don’t waste my time with nonsense.”'
+        ],
+        result: "You are a realist and a professional. You stand firmly on your feet, with a sharp mind and loyalty to your principles. You are the foundation that keeps order within life's chaos."
+    },
+    elisa: {
+        name: 'Elisa',
+        role: 'The first love · the lost paradise',
+        img: 'images/quiz_Elisa.jpg',
+        rel: "The girl Jep loved as a young man by the sea — the memory that has shadowed every glittering year since. He learns of her again, decades later, only when her husband comes to say she has died, and that she loved Jep her whole life.",
+        scenes: [
+            'Flashbacks to the lighthouse, the sea, and a single night of almost.',
+            'Her widower’s visit, and the confession that reopens everything.',
+            'The image Jep keeps returning to when the noise finally falls away.'
+        ],
+        quotes: [
+            '“She loved you. Only you. Her whole life.”',
+            '“The most important thing is not to waste time on what you don’t want.”',
+            'A first love, a sea breeze, an innocence that never comes back.'
+        ],
+        result: "You are a symbol of purity and lost paradise. A nostalgia for the perfect moment lives in you. You remind those around you of who they were before life made them complex and cynical."
+    },
+    maria: {
+        name: 'Sister Maria — “La Santa”',
+        role: 'The saint · the conscience',
+        img: 'images/quiz_Saint.jpg',
+        rel: "A one-hundred-and-four-year-old missionary the whole city calls the Saint. Frail and unflinching, she sees straight through Jep's emptiness and asks the question no one dares: why did he never write a second novel? Her answer — about roots — sends him back to where meaning began.",
+        scenes: [
+            'The hushed dinner where she barely speaks, and everyone leans in.',
+            'Climbing the Holy Stairs on her knees at dawn.',
+            'The flamingos resting on Jep’s terrace as the sun comes up.'
+        ],
+        quotes: [
+            '“Do you know why I only eat roots? Because roots are important.”',
+            '“Poverty is not to be spoken of — it is to be lived.”',
+            '“Why did you never write another book?”'
+        ],
+        result: "You are a person of spirit and discipline. You believe in the importance of “roots” and you despise excess. Your presence makes others think about the eternal — even when they aren't ready for it."
+    }
+};
+
+function initFighter() {
+    const nodes = document.querySelectorAll('.char-node');
+    if (!nodes.length) return;
+    nodes.forEach(n => n.addEventListener('click', () => showCharacter(n.dataset.char)));
+    showCharacter('jep'); // default
+}
+
+function showCharacter(key) {
+    const c = CHARACTERS[key];
+    const panel = document.getElementById('charDetail');
+    if (!c || !panel) return;
+
+    document.querySelectorAll('.char-node').forEach(n => {
+        n.classList.toggle('active', n.dataset.char === key);
+    });
+
+    panel.innerHTML = `
+        <p class="cd-role">${c.role}</p>
+        <h3 class="cd-name">${c.name}</h3>
+        <p class="cd-rel">${c.rel}</p>
+        <p class="cd-block-label">Significant scenes</p>
+        <ul class="cd-scenes">${c.scenes.map(s => `<li>${s}</li>`).join('')}</ul>
+        <p class="cd-block-label">Lines that linger</p>
+        <div class="cd-quotes">${c.quotes.map(q => `<p class="cd-quote">${q}</p>`).join('')}</div>
+    `;
+    panel.classList.remove('swap');
+    void panel.offsetWidth;
+    panel.classList.add('swap');
+}
+
+/* ---------- 5d. The quiz — "Who are you in The Great Beauty?" ---------- */
+const QUIZ = [
+    {
+        q: 'How do you usually behave at large social events or parties?',
+        a: [
+            "I'm the life of the party — the king (or queen) of the night. I set the rhythm, but deep down I'm bored to death.",
+            "I feel like a stranger at this feast of life; I'd rather watch from the side or have one heart-to-heart.",
+            "I'm here on business: observing, gathering information, running things, analysing what's happening.",
+            "I'm not here at all. I exist only in someone's bright and distant memories.",
+            'Parties are vanity. I prefer silence, asceticism, and focus on something eternal.'
+        ]
+    },
+    {
+        q: 'What, to you, is the true "great beauty"?',
+        a: [
+            "An elusive moment that can't be put into words — though I've spent my whole life trying.",
+            'Sincerity and honesty, even when they come with sadness or physical decay.',
+            'Professionalism, devotion to your craft, and seeing the essence of things beneath the gloss.',
+            'First love, a sea breeze, and an innocence that can never be regained.',
+            'Roots. We must remember where we came from and feed on that soil.'
+        ]
+    },
+    {
+        q: 'What is your relationship with your own past?',
+        a: [
+            'A baggage of disappointments and one bright flash I keep returning to in my mind.',
+            'The past is what made me a tired but understanding person.',
+            'My past is my experience, my authority, and my principles.',
+            'I am the past itself — pure, idealised, and frozen in time.',
+            "The past doesn't matter unless it's tied to eternity and the spiritual path."
+        ]
+    },
+    {
+        q: 'What would you say to someone who asks you the meaning of life?',
+        a: [
+            '"I looked for it everywhere, but found it only in emptiness and beautiful scenery."',
+            '"It’s simply to be near someone who understands you, until the lights go out."',
+            '"It’s in the work, and in staying true to yourself in this mad world."',
+            '"It’s in that single glance we exchanged so many years ago."',
+            '"Do you know why I eat only roots? Because roots are important."'
+        ]
+    },
+    {
+        q: 'What is your main role in your circle of friends?',
+        a: [
+            'The cynical intellectual who can both amuse you and prick you with the truth.',
+            'The one you can trust with a secret, and stay silent with about what matters.',
+            'The wise mentor — or the strict but fair critic.',
+            'The muse, whose image inspires but stays out of reach.',
+            'The conscience, reminding everyone that all earthly things are dust.'
+        ]
+    }
+];
+
+const QUIZ_KEY = { A: 'jep', B: 'ramona', C: 'dadina', D: 'elisa', E: 'maria' };
+const LETTERS = ['A', 'B', 'C', 'D', 'E'];
+const quizAnswers = {};
+
+function initQuiz() {
+    const wrap = document.getElementById('quizQuestions');
+    if (!wrap) return;
+
+    wrap.innerHTML = QUIZ.map((item, i) => `
+        <div class="quiz-q" data-i="${i}">
+            <p class="quiz-q-num">${String(i + 1).padStart(2, '0')} / 05</p>
+            <h4 class="quiz-q-text">${item.q}</h4>
+            <div class="quiz-opts">
+                ${item.a.map((opt, j) => `
+                    <button class="quiz-opt" data-q="${i}" data-letter="${LETTERS[j]}">
+                        <span class="opt-letter">${LETTERS[j]}</span>
+                        <span class="opt-text">${opt}</span>
+                    </button>`).join('')}
+            </div>
+        </div>`).join('');
+
+    wrap.querySelectorAll('.quiz-opt').forEach(btn => {
+        btn.addEventListener('click', () => selectOption(btn));
+    });
+
+    document.getElementById('quizReveal').addEventListener('click', revealResult);
+}
+
+function selectOption(btn) {
+    const q = btn.dataset.q;
+    // single choice per question
+    document.querySelectorAll(`.quiz-opt[data-q="${q}"]`).forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    quizAnswers[q] = btn.dataset.letter;
+
+    const answered = Object.keys(quizAnswers).length;
+    document.getElementById('quizProgress').textContent = answered + ' / 5 answered';
+    document.getElementById('quizReveal').disabled = answered < QUIZ.length;
+}
+
+function revealResult() {
+    // tally the letters, break ties by A→E order
+    const counts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+    Object.values(quizAnswers).forEach(l => counts[l]++);
+    let best = 'A';
+    LETTERS.forEach(l => { if (counts[l] > counts[best]) best = l; });
+
+    const key = QUIZ_KEY[best];
+    const c = CHARACTERS[key];
+    const box = document.getElementById('quizResult');
+
+    box.innerHTML = `
+        <img class="result-img" src="${c.img}" alt="${c.name}">
+        <div class="result-body">
+            <p class="kicker">You are</p>
+            <h3 class="result-name">${c.name}</h3>
+            <p class="result-role">${c.role}</p>
+            <p class="result-text">${c.result}</p>
+            <div class="result-actions">
+                <button class="btn" id="resultMeet">Meet them in the constellation <span class="arrow">→</span></button>
+                <button class="btn btn-ghost" id="quizRetake">Retake the quiz</button>
+            </div>
+        </div>`;
+    box.hidden = false;
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    document.getElementById('resultMeet').addEventListener('click', () => {
+        showCharacter(key);
+        document.querySelector('#fighter .constellation').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    document.getElementById('quizRetake').addEventListener('click', resetQuiz);
+}
+
+function resetQuiz() {
+    Object.keys(quizAnswers).forEach(k => delete quizAnswers[k]);
+    document.querySelectorAll('.quiz-opt.selected').forEach(b => b.classList.remove('selected'));
+    document.getElementById('quizProgress').textContent = '0 / 5 answered';
+    document.getElementById('quizReveal').disabled = true;
+    const box = document.getElementById('quizResult');
+    box.hidden = true;
+    box.innerHTML = '';
+    document.querySelector('.quiz-head').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ---------- 6. The crack / glass-shatter experience ---------- */
