@@ -579,7 +579,6 @@ const QUIZ = [
             'Parties are vanity. I prefer silence, asceticism, and focus on something eternal.',
             "I quietly stand by my best friend's side — the loyal one nobody really notices.",
             "I dominate the conversation with my opinions and judge everyone else's lack of commitment.",
-            'I hold court gracefully, deflecting anything too pointed with charm and a good story.',
             'I shout across the room, say something crude, and somehow everyone laughs anyway.'
         ]
     },
@@ -593,7 +592,6 @@ const QUIZ = [
             'Roots. We must remember where we came from and feed on that soil.',
             'A simple home, a few good books, and a friendship that never asked anything in return.',
             "Beauty has to serve a cause — otherwise it's just decoration for the privileged.",
-            'A perfectly executed recipe, passed down and refined over a lifetime.',
             "A loud, honest marriage nobody else believes is real — but it is."
         ]
     },
@@ -607,7 +605,6 @@ const QUIZ = [
             "The past doesn't matter unless it's tied to eternity and the spiritual path.",
             'My past is full of small failures and a play I never managed to stage.',
             "My past is a list of causes I've championed — though I admit I've sacrificed little for them.",
-            "My past is full of private certainties I've never had to defend out loud.",
             "My past is full of deals, a few affairs, and zero regrets I'd ever admit to."
         ]
     },
@@ -621,7 +618,6 @@ const QUIZ = [
             '"Do you know why I eat only roots? Because roots are important."',
             '"It\'s in showing up for the people you love, even when nothing ever changes."',
             '"It\'s commitment — though don\'t ask me to actually give anything up for it."',
-            '"Ah — but first, have you tried my recipe for stuffed rabbit?"',
             '"Why use ten words when one will do the job?"'
         ]
     },
@@ -635,13 +631,12 @@ const QUIZ = [
             'The conscience, reminding everyone that all earthly things are dust.',
             'The quiet, faithful one who always answers the phone.',
             'The self-appointed conscience, quick to criticize everyone but myself.',
-            'The respected elder everyone defers to, and nobody quite challenges.',
             "The blunt one who says the thing nobody else will say out loud."
         ]
     }
 ];
-const QUIZ_KEY = { A: 'jep', B: 'ramona', C: 'dadina', D: 'elisa', E: 'maria', F: 'romano', G: 'stefania', H: 'cardinal', I: 'lello' };
-const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+const QUIZ_KEY = { A: 'jep', B: 'ramona', C: 'dadina', D: 'elisa', E: 'maria', F: 'romano', G: 'stefania', H: 'lello' };
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 const quizAnswers = {};
 
 function initQuiz() {
@@ -672,9 +667,10 @@ function selectOption(btn) {
     document.getElementById('quizReveal').disabled = answered < QUIZ.length;
 }
 function revealResult() {
-    const counts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+    const counts = {};
+    LETTERS.forEach(l => counts[l] = 0);
     Object.values(quizAnswers).forEach(l => counts[l]++);
-    let best = 'A';
+    let best = LETTERS[0];
     LETTERS.forEach(l => { if (counts[l] > counts[best]) best = l; });
     const key = QUIZ_KEY[best];
     const c = CHARACTERS[key];
