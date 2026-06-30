@@ -396,6 +396,57 @@ const CHARACTERS = {
             '“Why did you never write another book?”'
         ],
         result: "You are a person of spirit and discipline. You believe in the importance of “roots” and you despise excess. Your presence makes others think about the eternal — even when they aren't ready for it."
+    },
+    romano: {
+        name: 'Romano',
+        role: "The loyal friend · the playwright who never made it",
+        img: 'images/quiz_Romano.jpg',
+        rel: "Jep's oldest, gentlest friend — an aspiring playwright who never staged the work he believed in, and who has loved a woman for years without ever quite saying so. Unlike the rest of the circle, Romano carries no irony, only quiet devotion. Eventually Rome wears him down, and he goes home.",
+        scenes: [
+            'Reading his unproduced play aloud to anyone who will listen.',
+            'A small, unspoken tenderness toward a woman who never notices.',
+            'His farewell — packing a single suitcase and leaving the city that never made room for him.'
+        ],
+        quotes: [
+            '“I came to Rome at eighteen, full of hopes I didn’t even understand.”',
+            '“Rome disappoints you. It makes you waste a lot of time.”',
+            '“I have to go. I came here too young, and I didn’t do anything.”'
+        ],
+        result: "You are the quiet, faithful heart of the group — sincere where everyone else is performing. You ask little and give a great deal, and your gentleness can look like failure to people who only value spectacle."
+    },
+    stefania: {
+        name: 'Stefania',
+        role: "The committed novelist · the moralist",
+        img: 'images/quiz_Stefania.jpg',
+        rel: "A writer who has built her identity on political commitment, motherhood and self-described sacrifice, and who never tires of reminding the room of it. At one party she lectures Jep on his wasted talent — until he, with surgical calm, dismantles every claim she has made about her own life.",
+        scenes: [
+            'Holding court at a party, listing her novels and her causes.',
+            'Pressing Jep about why he never wrote a second book.',
+            'Sitting in silence as Jep recites, calmly and precisely, the gap between her self-image and her choices.'
+        ],
+        quotes: [
+            '“I have eleven novels, a husband, and a complicated, profound family life.”',
+            '“And you — what have you done, besides being charming?”',
+            '(Jep, to her) “You have the contemptuous tone of one who is sure of herself. You are not.”'
+        ],
+        result: "You are principled in your own telling and quick to judge others by a standard you quietly exempt yourself from. Your conviction is real, but so is the gap between what you say and what you've actually risked."
+    },
+    lello: {
+        name: 'Lello Cava',
+        role: "The toy wholesaler · the unembarrassed one",
+        img: 'images/quiz_Lello.jpg',
+        rel: "A wealthy, loud, unapologetically vulgar toy merchant in Jep's circle — the one friend with no pretense of being an intellectual. He's unfaithful to his wife, Trumeau, while insisting in public that theirs is the only real marriage left in Italy. He's coarse where the others are coded, and somehow more honest for it.",
+        scenes: [
+            "Shouting good-naturedly across the dance floor at one of Jep's parties.",
+            'Declaring, straight-faced, that he and his wife are the only couple in Italy still in love.',
+            "Dismissing Italy's reputation abroad in one blunt, deflating line."
+        ],
+        quotes: [
+            '“My wife and I are the only couple in Italy who are in love.”',
+            '“Fashion and pizza. A country of weavers and grocers.”',
+            '“Why use ten words when one will do the job?”'
+        ],
+        result: "You're the unfiltered one — blunt, a little crude, and allergic to the group's pretensions. You'll never out-talk the intellectuals at the table, but you say more true things by accident than they manage on purpose."
     }
 };
 
@@ -438,7 +489,11 @@ const QUIZ = [
             "I feel like a stranger at this feast of life; I'd rather watch from the side or have one heart-to-heart.",
             "I'm here on business: observing, gathering information, running things, analysing what's happening.",
             "I'm not here at all. I exist only in someone's bright and distant memories.",
-            'Parties are vanity. I prefer silence, asceticism, and focus on something eternal.'
+            'Parties are vanity. I prefer silence, asceticism, and focus on something eternal.',
+            "I quietly stand by my best friend's side — the loyal one nobody really notices.",
+            "I dominate the conversation with my opinions and judge everyone else's lack of commitment.",
+            'I hold court gracefully, deflecting anything too pointed with charm and a good story.',
+            'I shout across the room, say something crude, and somehow everyone laughs anyway.'
         ]
     },
     {
@@ -448,7 +503,11 @@ const QUIZ = [
             'Sincerity and honesty, even when they come with sadness or physical decay.',
             'Professionalism, devotion to your craft, and seeing the essence of things beneath the gloss.',
             'First love, a sea breeze, and an innocence that can never be regained.',
-            'Roots. We must remember where we came from and feed on that soil.'
+            'Roots. We must remember where we came from and feed on that soil.',
+            'A simple home, a few good books, and a friendship that never asked anything in return.',
+            "Beauty has to serve a cause — otherwise it's just decoration for the privileged.",
+            'A perfectly executed recipe, passed down and refined over a lifetime.',
+            "A loud, honest marriage nobody else believes is real — but it is."
         ]
     },
     {
@@ -458,7 +517,11 @@ const QUIZ = [
             'The past is what made me a tired but understanding person.',
             'My past is my experience, my authority, and my principles.',
             'I am the past itself — pure, idealised, and frozen in time.',
-            "The past doesn't matter unless it's tied to eternity and the spiritual path."
+            "The past doesn't matter unless it's tied to eternity and the spiritual path.",
+            'My past is full of small failures and a play I never managed to stage.',
+            "My past is a list of causes I've championed — though I admit I've sacrificed little for them.",
+            "My past is full of private certainties I've never had to defend out loud.",
+            "My past is full of deals, a few affairs, and zero regrets I'd ever admit to."
         ]
     },
     {
@@ -468,7 +531,11 @@ const QUIZ = [
             '"It’s simply to be near someone who understands you, until the lights go out."',
             '"It’s in the work, and in staying true to yourself in this mad world."',
             '"It’s in that single glance we exchanged so many years ago."',
-            '"Do you know why I eat only roots? Because roots are important."'
+            '"Do you know why I eat only roots? Because roots are important."',
+            '"It\'s in showing up for the people you love, even when nothing ever changes."',
+            '"It\'s commitment — though don\'t ask me to actually give anything up for it."',
+            '"Ah — but first, have you tried my recipe for stuffed rabbit?"',
+            '"Why use ten words when one will do the job?"'
         ]
     },
     {
@@ -478,13 +545,16 @@ const QUIZ = [
             'The one you can trust with a secret, and stay silent with about what matters.',
             'The wise mentor — or the strict but fair critic.',
             'The muse, whose image inspires but stays out of reach.',
-            'The conscience, reminding everyone that all earthly things are dust.'
+            'The conscience, reminding everyone that all earthly things are dust.',
+            'The quiet, faithful one who always answers the phone.',
+            'The self-appointed conscience, quick to criticize everyone but myself.',
+            'The respected elder everyone defers to, and nobody quite challenges.',
+            "The blunt one who says the thing nobody else will say out loud."
         ]
     }
 ];
-
-const QUIZ_KEY = { A: 'jep', B: 'ramona', C: 'dadina', D: 'elisa', E: 'maria' };
-const LETTERS = ['A', 'B', 'C', 'D', 'E'];
+const QUIZ_KEY = { A: 'jep', B: 'ramona', C: 'dadina', D: 'elisa', E: 'maria', F: 'romano', G: 'stefania', H: 'cardinal', I: 'lello' };
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 const quizAnswers = {};
 
 function initQuiz() {
