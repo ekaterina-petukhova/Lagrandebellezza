@@ -6,7 +6,7 @@
     <title>La Grande Bellezza | Paolo Sorrentino</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Serif+Display:ital@0;1&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
     <!-- Leaflet — interactive map of Rome on the City map screen -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
@@ -32,10 +32,27 @@
                 </svg>
                 Home
             </button></li>
-            <li><button data-modal="modal-about">About</button></li>
-            <li><button data-modal="modal-docs">Documentation</button></li>
-            <li><a href="mailto:email@example.com">Team</a></li>
             <li><button class="nav-narr" data-go="narratives">Narratives</button></li>
+            <li><button data-go="timeline">Timeline</button></li>
+            <li><button data-go="citymap">Map</button></li>
+            <li><button data-go="about">About</button></li>
+            <li><button data-go="documentation">Docs</button></li>
+            <li><button class="nav-team" data-go="team">Team</button></li>
+
+            <!-- theme switcher -->
+            <li class="theme-switch">
+                <button class="theme-toggle" id="themeToggle" aria-haspopup="true" title="Switch the theme">
+                    <span class="theme-swatch" aria-hidden="true"></span>
+                    <span class="theme-cur" id="themeCurrent">Notte dorata</span>
+                </button>
+                <div class="theme-panel" id="themePanel" role="menu">
+                    <p class="theme-panel-label">Graphic theme</p>
+                    <button class="theme-opt" data-theme-set="notte" role="menuitem"><span class="ts ts-notte"></span>Notte dorata<em>Gold on Roman night</em></button>
+                    <button class="theme-opt" data-theme-set="carta" role="menuitem"><span class="ts ts-carta"></span>Carta<em>Exhibition print, on paper</em></button>
+                    <button class="theme-opt" data-theme-set="cinema" role="menuitem"><span class="ts ts-cinema"></span>Cinema<em>Black-and-white film</em></button>
+                    <button class="theme-opt" data-theme-set="affresco" role="menuitem"><span class="ts ts-affresco"></span>Affresco<em>Warm baroque fresco</em></button>
+                </div>
+            </li>
         </ul>
         <a class="nav-logo" href="#home" aria-label="Home">
             <img src="images/icon.colosseum.png" alt="Colosseum">
@@ -44,14 +61,19 @@
 
     <!-- ============ SIDE MENU (the labyrinth) ============ -->
     <aside class="side-menu" id="sideMenu">
-        <p class="menu-label">The labyrinth · five passages</p>
-        <div class="menu-item" data-go="loc1"><span class="num">01</span><span class="name">The Janiculum Hill</span></div>
-        <div class="menu-item" data-go="loc2"><span class="num">02</span><span class="name">Jep's Terrace &amp; the Colosseum</span></div>
-        <div class="menu-item" data-go="loc3"><span class="num">03</span><span class="name">The Aventine Hill</span></div>
-        <div class="menu-item" data-go="loc4"><span class="num">04</span><span class="name">The Baths of Caracalla</span></div>
-        <div class="menu-item" data-go="loc5"><span class="num">05</span><span class="name">Palazzo Brancaccio</span></div>
-        <div class="menu-item" data-go="citymap"><span class="num">✶</span><span class="name">City map</span></div>
-        <div class="menu-item" data-go="fighter"><span class="num">VS</span><span class="name">Choose your fighter</span></div>
+        <p class="menu-label">The labyrinth · thirteen passages</p>
+        <div class="side-menu-scroll">
+            <div id="sideMenuList"></div>
+            <p class="menu-label menu-label-2">The exhibition</p>
+            <div class="menu-item" data-go="narratives"><span class="num">✶</span><span class="name">Narratives</span></div>
+            <div class="menu-item" data-go="timeline"><span class="num">↧</span><span class="name">Historical timeline</span></div>
+            <div class="menu-item" data-go="citymap"><span class="num">◎</span><span class="name">Map &amp; one-day itinerary</span></div>
+            <div class="menu-item" data-go="fighter"><span class="num">VS</span><span class="name">Choose your fighter</span></div>
+            <div class="menu-item" data-go="about"><span class="num">i</span><span class="name">About</span></div>
+            <div class="menu-item" data-go="documentation"><span class="num">§</span><span class="name">Documentation</span></div>
+            <div class="menu-item" data-go="disclaimer"><span class="num">©</span><span class="name">Disclaimer</span></div>
+            <div class="menu-item" data-go="team"><span class="num">✦</span><span class="name">Team</span></div>
+        </div>
     </aside>
     <div class="side-scrim" id="sideScrim"></div>
 
@@ -123,170 +145,28 @@
             </div>
         </section>
 
-        <!-- ===== LOCATION 1 — THE JANICULUM HILL ===== -->
-        <section class="screen location" id="loc1" data-step="1" data-name="The Janiculum Hill">
-            <div class="loc-hero">
-                <img class="loc-img" data-parallax src="images/1location1.png" alt="The Janiculum Terrace">
-                <div class="loc-hero-text">
-                    <span class="kicker reveal">Passage 01 · Where it begins</span>
-                    <h2 class="loc-title reveal">The Janiculum Hill &amp; Fontana dell'Acqua Paola</h2>
-                </div>
-            </div>
-            <div class="loc-body">
-                <div class="loc-meta reveal">
-                    <div class="meta-item"><div class="meta-k">Coordinates</div><div class="meta-v">41.8898° N, 12.4615° E</div></div>
-                    <div class="meta-item"><div class="meta-k">Scene</div><div class="meta-v">The opening</div></div>
-                    <div class="meta-item"><div class="meta-k">Rome</div><div class="meta-v">Gianicolo Terrace</div></div>
-                </div>
-                <div class="loc-prose reveal">
-                    <p class="firstcap"><span class="lead">The film famously opens at the Gianicolo Terrace</span>, where a Japanese tourist collapses from the city's sheer beauty. Before a single word of the story is spoken, Rome has already overwhelmed someone — beauty as a force strong enough to stop a heart.</p>
-                </div>
-                <div class="loc-gallery reveal">
-                    <figure><img data-parallax src="images/1location1.png" alt="Gianicolo Terrace">
-                        <figcaption>Gianicolo Terrace — the opening view</figcaption></figure>
-                    <figure><img src="images/1location2.png" alt="Fontana dell'Acqua Paola">
-                        <figcaption>Fontana dell'Acqua Paola</figcaption></figure>
-                </div>
-            </div>
-            <nav class="loc-nav">
-                <a data-go="home"><span class="dir">← Back</span><span class="dest">The beginning</span></a>
-                <a class="next" data-go="loc2"><span class="dir">Next passage →</span><span class="dest">Jep's Terrace &amp; the Colosseum</span></a>
-            </nav>
-        </section>
-
-        <!-- ===== LOCATION 2 — JEP'S TERRACE & THE COLOSSEUM ===== -->
-        <section class="screen location" id="loc2" data-step="2" data-name="Jep's Terrace &amp; the Colosseum">
-            <div class="loc-hero">
-                <img class="loc-img" data-parallax src="images/colosseo.jpg" alt="Jep's Terrace overlooking the Colosseum">
-                <div class="loc-hero-text">
-                    <span class="kicker reveal">Passage 02 · The decadent circle</span>
-                    <h2 class="loc-title reveal">Jep's Terrace &amp; the Colosseum</h2>
-                </div>
-            </div>
-            <div class="loc-body">
-                <div class="loc-meta reveal">
-                    <div class="meta-item"><div class="meta-k">Coordinates</div><div class="meta-v">41.8902° N, 12.4922° E</div></div>
-                    <div class="meta-item"><div class="meta-k">Address</div><div class="meta-v">Piazza del Colosseo, 9</div></div>
-                    <div class="meta-item"><div class="meta-k">Character</div><div class="meta-v">Jep Gambardella</div></div>
-                </div>
-                <div class="loc-prose reveal">
-                    <p class="firstcap"><span class="lead">Let's start out from Jep Gambardella's place.</span> Gambardella is the main character. Sorrentino chose as his home a penthouse in a palazzo facing Piazza del Colosseo at no. 9. It is located on the southern side of the Flavian Amphitheatre, the most famous monument in the world.</p>
-                    <p>Nightfall transitions the party to the private terrace of Jep Gambardella — overlooking the Colosseum and the ruined Temple of Claudius — setting the stage for his decadent social circle.</p>
-                </div>
-                <div class="loc-gallery single reveal">
-                    <figure><img src="images/colosseo.jpg" alt="The Colosseum from Jep's terrace">
-                        <figcaption>The Flavian Amphitheatre, seen from the terrace</figcaption></figure>
-                </div>
-            </div>
-            <nav class="loc-nav">
-                <a data-go="loc1"><span class="dir">← Previous</span><span class="dest">The Janiculum Hill</span></a>
-                <a class="next" data-go="loc3"><span class="dir">Next passage →</span><span class="dest">The Aventine Hill</span></a>
-            </nav>
-        </section>
-
-        <!-- ===== LOCATION 3 — THE AVENTINE HILL ===== -->
-        <section class="screen location" id="loc3" data-step="3" data-name="The Aventine Hill">
-            <div class="loc-hero">
-                <img class="loc-img" data-parallax src="images/aventine.JPG" alt="The Aventine Hill">
-                <div class="loc-hero-text">
-                    <span class="kicker reveal">Passage 03 · The keyhole</span>
-                    <h2 class="loc-title reveal">The Aventine Hill</h2>
-                </div>
-            </div>
-            <div class="loc-body">
-                <div class="loc-meta reveal">
-                    <div class="meta-item"><div class="meta-k">Coordinates</div><div class="meta-v">41.8836° N, 12.4783° E</div></div>
-                    <div class="meta-item"><div class="meta-k">Sight</div><div class="meta-v">The Priory keyhole</div></div>
-                    <div class="meta-item"><div class="meta-k">Frames</div><div class="meta-v">St. Peter's Dome</div></div>
-                </div>
-                <div class="loc-prose reveal">
-                    <p class="firstcap"><span class="lead">Jep and his friends wander the quiet, cobblestone streets</span>, gazing at the Basilica of Santa Sabina and the famous keyhole at the Villa of the Priory of Malta, which frames a magical view of St. Peter's Dome — beauty captured in a single, secret aperture.</p>
-                </div>
-                <div class="loc-gallery single reveal">
-                    <figure><img src="images/aventine.JPG" alt="The Aventine Hill streets">
-                        <figcaption>The Aventine — Santa Sabina &amp; the Priory of Malta</figcaption></figure>
-                </div>
-            </div>
-            <nav class="loc-nav">
-                <a data-go="loc2"><span class="dir">← Previous</span><span class="dest">Jep's Terrace &amp; the Colosseum</span></a>
-                <a class="next" data-go="loc4"><span class="dir">Next passage →</span><span class="dest">The Baths of Caracalla</span></a>
-            </nav>
-        </section>
-
-        <!-- ===== LOCATION 4 — THE BATHS OF CARACALLA ===== -->
-        <section class="screen location" id="loc4" data-step="4" data-name="The Baths of Caracalla">
-            <div class="loc-hero">
-                <img class="loc-img" data-parallax src="images/caracalla.JPG" alt="The Baths of Caracalla">
-                <div class="loc-hero-text">
-                    <span class="kicker reveal">Passage 04 · Where dreams meet reality</span>
-                    <h2 class="loc-title reveal">The Baths of Caracalla</h2>
-                </div>
-            </div>
-            <div class="loc-body">
-                <div class="loc-meta reveal">
-                    <div class="meta-item"><div class="meta-k">Coordinates</div><div class="meta-v">41.8790° N, 12.4925° E</div></div>
-                    <div class="meta-item"><div class="meta-k">Illusion</div><div class="meta-v">The disappearing giraffe</div></div>
-                    <div class="meta-item"><div class="meta-k">Heart of</div><div class="meta-v">Archaeological Rome</div></div>
-                </div>
-                <div class="loc-prose reveal">
-                    <p class="firstcap"><span class="lead">"The Great Beauty" is a film where dreams and reality meet</span>, as reflected in the photographic exhibition under the loggia of Villa Giulia or in the trick of the disappearing giraffe, at the Baths of Caracalla — at the very heart of archaeological Rome.</p>
-                    <p>Before departing Rome, an old friend comes to Jep to say farewell. Having seen through the city's facade of pretense and apathy, he leaves behind everything — except for Jep, the only man he found who stood unbroken against the vanity of the world.</p>
-                </div>
-                <div class="loc-gallery single reveal">
-                    <figure><img src="images/caracalla.JPG" alt="The Baths of Caracalla ruins">
-                        <figcaption>The Baths of Caracalla — where the giraffe vanishes</figcaption></figure>
-                </div>
-            </div>
-            <nav class="loc-nav">
-                <a data-go="loc3"><span class="dir">← Previous</span><span class="dest">The Aventine Hill</span></a>
-                <a class="next" data-go="loc5"><span class="dir">Next passage →</span><span class="dest">Palazzo Brancaccio</span></a>
-            </nav>
-        </section>
-
-        <!-- ===== LOCATION 5 — PALAZZO BRANCACCIO ===== -->
-        <section class="screen location" id="loc5" data-step="5" data-name="Palazzo Brancaccio">
-            <div class="loc-hero">
-                <img class="loc-img" data-parallax src="images/botox1.jpg" alt="Palazzo Brancaccio — the botox party">
-                <div class="loc-hero-text">
-                    <span class="kicker reveal">Passage 05 · The beauty cure</span>
-                    <h2 class="loc-title reveal">Palazzo Brancaccio</h2>
-                </div>
-            </div>
-            <div class="loc-body">
-                <div class="loc-meta reveal">
-                    <div class="meta-item"><div class="meta-k">Coordinates</div><div class="meta-v">41.8954° N, 12.5018° E</div></div>
-                    <div class="meta-item"><div class="meta-k">Scene</div><div class="meta-v">The botox party</div></div>
-                    <div class="meta-item"><div class="meta-k">Theme</div><div class="meta-v">Beauty as a trick</div></div>
-                </div>
-                <div class="loc-prose reveal">
-                    <p class="firstcap"><span class="lead">The botox party is one of the clearest visual condensations of this:</span> beauty here is literally a trick of needles and fillers, anticipating Jep's final reflection that life and art are "a trick" if they don't reconnect with genuine, lived beauty rather than its hollow image.</p>
-                    <p>The sequence is often called the "botox party" or "beauty cure" scene: a crowd of upper-class Romans, with faces already altered by surgery, gather in an ornate historic interior to receive injections of a supposed miraculous treatment.</p>
-                </div>
-                <div class="loc-gallery reveal">
-                    <figure><img data-parallax src="images/botox1.jpg" alt="The botox party crowd">
-                        <figcaption>The beauty cure — the queue forms</figcaption></figure>
-                    <figure><img src="images/botox2.jpg" alt="Injections at the party">
-                        <figcaption>Beauty as a trick of needles and fillers</figcaption></figure>
-                </div>
-            </div>
-            <nav class="loc-nav">
-                <a data-go="loc4"><span class="dir">← Previous</span><span class="dest">The Baths of Caracalla</span></a>
-                <a class="next" data-go="citymap"><span class="dir">The whole map →</span><span class="dest">All five passages</span></a>
-            </nav>
-        </section>
+        <!-- ===== LOCATIONS 01–13 (rendered from data.js) ===== -->
+        <div id="locationScreens"></div>
 
         <!-- ===== NARRATIVES ===== -->
         <section class="screen narratives" id="narratives">
             <div class="narr-head">
                 <p class="kicker reveal">Narratives</p>
-                <h2 class="reveal">Reading Rome through the centuries</h2>
-                <p class="reveal">Three lenses on the places of <em>The Great Beauty</em> — the themes they carry, the kinds of place they are, and the ages that built them. Choose a thread and follow it back to the locations.</p>
+                <h2 class="reveal">Three ways to walk the great beauty</h2>
+                <p class="reveal">Choose a guided route through the film's Rome, or follow a single thread — a theme or a kind of place — back to the locations it touches.</p>
             </div>
 
-            <!-- Lens 01 — Themes -->
+            <!-- Guided visit narratives -->
+            <section class="lens">
+                <p class="lens-kicker reveal">Guided routes</p>
+                <h3 class="lens-title reveal">Pick a narrative and follow it, stop by stop</h3>
+                <div class="narr-cards" id="guidedNarr"></div>
+            </section>
+
+            <!-- Lens · Themes -->
             <section class="lens lens--theme">
                 <p class="lens-kicker reveal">Lens 01 · Themes</p>
-                <h3 class="lens-title reveal">Explore the narratives that run through Rome and the film</h3>
+                <h3 class="lens-title reveal">Explore the themes that run through Rome and the film</h3>
                 <div class="tag-row reveal">
                     <button class="narr-tag" data-narr="beauty-surface">Beauty on the surface</button>
                     <button class="narr-tag" data-narr="sacred-spiritual">The sacred &amp; the spiritual</button>
@@ -297,7 +177,7 @@
                 </div>
             </section>
 
-            <!-- Lens 02 — Typology -->
+            <!-- Lens · Typology -->
             <section class="lens lens--type">
                 <p class="lens-kicker reveal">Lens 02 · Typology</p>
                 <h3 class="lens-title reveal">Discover the different typologies of Roman places</h3>
@@ -311,56 +191,39 @@
                 </div>
             </section>
 
-            <!-- Lens 03 — Historical period -->
+            <!-- Lens · Centuries -> the timeline page -->
             <section class="lens lens--period">
                 <p class="lens-kicker reveal">Lens 03 · Through the centuries</p>
-                <h3 class="lens-title reveal">Explore the historical periods that shaped these places</h3>
-                <div class="tag-row reveal">
-                    <button class="narr-tag" data-narr="ancient">Ancient Rome · I–III c.</button>
-                    <button class="narr-tag" data-narr="early-christian">Early Christian · V c.</button>
-                    <button class="narr-tag" data-narr="baroque">Baroque · XVII c.</button>
-                    <button class="narr-tag" data-narr="enlightenment">Enlightenment · XVIII c.</button>
-                    <button class="narr-tag" data-narr="belle-epoque">Belle Époque · XIX c.</button>
-                    <button class="narr-tag" data-narr="contemporary">Contemporary · 2013</button>
-                </div>
+                <h3 class="lens-title reveal">Six ages built these places</h3>
+                <p class="lens-note reveal">From the imperial amphitheatre to Sorrentino's present-day Rome, the locations span two thousand years.</p>
+                <button class="btn btn-blue reveal" data-go="timeline">Open the historical timeline <span class="arrow">→</span></button>
             </section>
         </section>
 
-        <!-- ===== CITY MAP ===== -->
+        <!-- ===== HISTORICAL TIMELINE ===== -->
+        <section class="screen timeline" id="timeline">
+            <div class="map-head">
+                <p class="kicker reveal">The required thread</p>
+                <h2 class="reveal">A historical timeline of the locations</h2>
+                <p class="reveal">The thirteen places ordered by the age that built them — two thousand years of Rome, gathered by the film into a single restless night.</p>
+            </div>
+            <div class="timeline-track" id="timelineTrack"></div>
+        </section>
+
+        <!-- ===== CITY MAP & ONE-DAY ITINERARY ===== -->
         <section class="screen" id="citymap">
             <div class="map-head">
                 <p class="kicker reveal">The labyrinth, unfolded</p>
-                <h2 class="reveal">A map of the great beauty</h2>
-                <p class="reveal">Five places in Rome where Sorrentino lets dreams and reality meet. Choose a passage and wander.</p>
+                <h2 class="reveal">Map &amp; one-day itinerary</h2>
+                <p class="reveal">Thirteen places in Rome, threaded into a single day — the gold line follows the route in order, from the dawn fountain on the Janiculum to the galleries of the centro storico.</p>
             </div>
 
-            <!-- real, interactive map of Rome -->
-            <div class="rome-map-frame reveal">
-                <div id="romeMap" class="rome-map"></div>
-                <p class="rome-map-note">Hover a marker to preview the place · click it to enter the passage</p>
-            </div>
-
-            <div class="map-grid">
-                <div class="map-card reveal" data-go="loc1">
-                    <img src="images/1location2.png" alt="The Janiculum Hill">
-                    <div class="map-info"><div class="num">01</div><div class="nm">The Janiculum Hill</div></div>
+            <div class="map-layout">
+                <div class="rome-map-frame reveal">
+                    <div id="romeMap" class="rome-map"></div>
+                    <p class="rome-map-note">Hover a marker to preview · click it to enter the passage · the dashed line is the walking route</p>
                 </div>
-                <div class="map-card reveal" data-go="loc2">
-                    <img src="images/colosseo.jpg" alt="Jep's Terrace">
-                    <div class="map-info"><div class="num">02</div><div class="nm">Jep's Terrace &amp; the Colosseum</div></div>
-                </div>
-                <div class="map-card reveal" data-go="loc3">
-                    <img src="images/aventine.JPG" alt="The Aventine Hill">
-                    <div class="map-info"><div class="num">03</div><div class="nm">The Aventine Hill</div></div>
-                </div>
-                <div class="map-card reveal" data-go="loc4">
-                    <img src="images/caracalla.JPG" alt="The Baths of Caracalla">
-                    <div class="map-info"><div class="num">04</div><div class="nm">The Baths of Caracalla</div></div>
-                </div>
-                <div class="map-card reveal" data-go="loc5">
-                    <img src="images/botox2.jpg" alt="Palazzo Brancaccio">
-                    <div class="map-info"><div class="num">05</div><div class="nm">Palazzo Brancaccio</div></div>
-                </div>
+                <ol class="itinerary" id="itineraryList"></ol>
             </div>
         </section>
 
@@ -439,34 +302,121 @@
             </div>
         </section>
 
+        <!-- ===== TEAM ===== -->
+        <section class="screen team" id="team">
+            <div class="team-head">
+                <p class="kicker reveal">The team</p>
+                <h2 class="reveal">The wanderers behind the labyrinth</h2>
+                <p class="reveal">Three students who built this passage through the Rome of <em>The Great Beauty</em>. Write to us — we read every line.</p>
+            </div>
+
+            <div class="team-grid">
+                <figure class="team-card reveal">
+                    <div class="team-photo"><img src="images/team-M.jpg" alt="Maria Grigoryeva"></div>
+                    <figcaption>
+                        <h3 class="team-name">Maria Grigoryeva</h3>
+                        <a class="team-mail" href="mailto:maria.grigoryeva@studio.unibo.it">maria.grigoryeva@studio.unibo.it</a>
+                    </figcaption>
+                </figure>
+                <figure class="team-card reveal">
+                    <div class="team-photo"><img src="images/team-E.jpg" alt="Elnara Gasanova"></div>
+                    <figcaption>
+                        <h3 class="team-name">Elnara Gasanova</h3>
+                        <a class="team-mail" href="mailto:elnara.gasanova@studio.unibo.it">elnara.gasanova@studio.unibo.it</a>
+                    </figcaption>
+                </figure>
+                <figure class="team-card reveal">
+                    <div class="team-photo"><img src="images/team-K.jpg" alt="Ekaterina Petukhova"></div>
+                    <figcaption>
+                        <h3 class="team-name">Ekaterina Petukhova</h3>
+                        <a class="team-mail" href="mailto:ekaterina.petukhova@studio.unibo.it">ekaterina.petukhova@studio.unibo.it</a>
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- ===== ABOUT ===== -->
+        <section class="screen meta-page" id="about">
+            <div class="meta-wrap">
+                <p class="kicker reveal">About</p>
+                <h2 class="reveal">About this exhibition</h2>
+                <div class="meta-prose reveal">
+                    <p>This site is a guided wander through <em>La Grande Bellezza</em> (Paolo Sorrentino, 2013), the Academy Award–winning portrait of Rome as a city of dazzling surfaces and the search for meaning beneath them.</p>
+                    <p>It gathers <strong>thirteen real Roman locations</strong> tied to the film — all within one region and walkable in a single day — and presents each as a small exhibition panel: an identifying image, the exact shot position and camera orientation, systematic metadata, and texts you can adapt to your own depth and audience.</p>
+                    <p>The whole is built as a <strong>labyrinth</strong>, the film's own central image. From the home page you break the glittering surface of the city; beneath it lie the passages. Follow them in order along the one-day itinerary, or wander by theme, by kind of place, or by century.</p>
+                    <p>A student project for the University of Bologna, made by Maria Grigoryeva, Elnara Gasanova and Ekaterina Petukhova — see the <button class="inline-link" data-go="team">Team</button> page.</p>
+                </div>
+                <nav class="meta-nav">
+                    <a data-go="home"><span class="dir">← Back</span><span class="dest">Home</span></a>
+                    <a class="next" data-go="documentation"><span class="dir">Next →</span><span class="dest">Documentation</span></a>
+                </nav>
+            </div>
+        </section>
+
+        <!-- ===== DOCUMENTATION ===== -->
+        <section class="screen meta-page" id="documentation">
+            <div class="meta-wrap">
+                <p class="kicker reveal">Documentation</p>
+                <h2 class="reveal">How the project is built — and why</h2>
+                <div class="meta-prose reveal">
+                    <p>Every choice below is deliberate; this page sets out the reasoning rather than presenting the design as arbitrary taste.</p>
+
+                    <h3>One source of truth</h3>
+                    <p>All content lives in a single data file (<code>data.js</code>): the locations, their metadata, the texts, the narratives and the timeline. The pages, the map, the timeline and the side menu are all <em>rendered</em> from it. This guarantees that metadata stays <strong>uniform and systematic</strong> across every location, and makes the site an "active document" — a mashup of data, map and typography rather than hand-written pages.</p>
+
+                    <h3>The locations</h3>
+                    <p>Thirteen real sites, all in Rome (one region) and sequenced into a single walkable day. Each carries the same fields: the <strong>exact shot position</strong> (coordinates), the <strong>camera orientation</strong>, an <strong>identifying image</strong>, the scene and its timestamp, and a Dublin Core metadata block (<code>dcterms:title</code>, <code>subject</code>, <code>spatial</code>, <code>temporal</code>, <code>type</code>) chosen to suit each entity — exterior monuments, interiors, gardens, fountains.</p>
+
+                    <h3>The multimedia grid of texts</h3>
+                    <p>Each location offers nine texts on two switchable axes: <strong>depth</strong> (brief · medium · in depth) and <strong>audience</strong> (young · adult · scholar). We deliberately fused the "competence" and "tone" dimensions into a single audience axis, because in practice they correlate — the young reader wants an introductory, plain register; the scholar wants the advanced, specialist one. Two clear controls give the visitor real authorship over the reading without an unmanageable matrix.</p>
+
+                    <h3>Switchable themes</h3>
+                    <p>Four graphic/typographic themes — <em>Notte dorata</em>, <em>Carta</em>, <em>Cinema</em> and <em>Affresco</em> — change palette and type pairing across the whole site, and your choice is remembered between visits. Each is a distinct reading of the film: Roman night, exhibition print, black-and-white cinema, baroque fresco.</p>
+
+                    <h3>Narratives &amp; the timeline</h3>
+                    <p>Three guided routes (the one-day walk, "Jep's sacred Rome", "Decadence &amp; the trick") give ordered ways through the material; thematic and typological lenses let you follow a single thread; and a dedicated <button class="inline-link" data-go="timeline">historical timeline</button> arranges the places across two thousand years — the required diachronic reading.</p>
+
+                    <h3>Navigation</h3>
+                    <p>Every page carries previous/next navigation, the theme switcher sits in the top bar on all pages, and each location page has buttons to change the text's depth and audience. The interactive map draws the one-day itinerary as an ordered route.</p>
+                </div>
+                <nav class="meta-nav">
+                    <a data-go="about"><span class="dir">← Previous</span><span class="dest">About</span></a>
+                    <a class="next" data-go="disclaimer"><span class="dir">Next →</span><span class="dest">Disclaimer</span></a>
+                </nav>
+            </div>
+        </section>
+
+        <!-- ===== DISCLAIMER ===== -->
+        <section class="screen meta-page" id="disclaimer">
+            <div class="meta-wrap">
+                <p class="kicker reveal">Disclaimer</p>
+                <h2 class="reveal">Disclaimer &amp; credits</h2>
+                <div class="meta-prose reveal">
+                    <p>This is a <strong>non-commercial student project</strong> made for a course at the University of Bologna, for educational and illustrative purposes only.</p>
+                    <p><em>La Grande Bellezza</em> (2013) and all its imagery are the property of their respective rights holders (Indigo Film, Medusa Film, and the film's creators). Any film stills or references appear here under fair-use principles for study and commentary; this project is not affiliated with, authorised by, or endorsed by the film's producers or distributors.</p>
+                    <p>Photographs of the locations are used to identify and document the real places. Coordinates, camera orientations and scene timestamps are <strong>approximate</strong>, compiled from public sources for orientation; they are not survey-grade and some on-screen locations are reconstructed or composited in the film.</p>
+                    <p>Map data &copy; OpenStreetMap contributors, tiles &copy; CARTO. Typography served by Google Fonts. Interactive map by Leaflet.</p>
+                </div>
+                <nav class="meta-nav">
+                    <a data-go="documentation"><span class="dir">← Previous</span><span class="dest">Documentation</span></a>
+                    <a class="next" data-go="citymap"><span class="dir">Next →</span><span class="dest">Map &amp; itinerary</span></a>
+                </nav>
+            </div>
+        </section>
+
     </main>
 
     <!-- ============ FOOTER ============ -->
     <footer class="site-footer">
         <div class="f-title">La Grande Bellezza</div>
         <div class="f-meta">Paolo Sorrentino · 2013 · A labyrinth of Rome</div>
+        <nav class="f-links">
+            <button data-go="about">About</button>
+            <button data-go="documentation">Documentation</button>
+            <button data-go="disclaimer">Disclaimer</button>
+            <button data-go="team">Team</button>
+        </nav>
     </footer>
-
-    <!-- ============ MODALS ============ -->
-    <div class="modal" id="modal-about">
-        <div class="modal-scrim" data-close></div>
-        <div class="modal-box">
-            <button class="modal-close" data-close>&times;</button>
-            <h3>About</h3>
-            <p>This site is a wander through <em>La Grande Bellezza</em> (2013), Paolo Sorrentino's Academy Award–winning portrait of Rome — a city of dazzling surfaces and the search for meaning beneath them.</p>
-            <p>It is built as a labyrinth: a home, a shattering of the surface, and five real Roman locations where the film was shot. Break the glass, then follow the passages.</p>
-        </div>
-    </div>
-
-    <div class="modal" id="modal-docs">
-        <div class="modal-scrim" data-close></div>
-        <div class="modal-box">
-            <button class="modal-close" data-close>&times;</button>
-            <h3>Documentation</h3>
-            <p>Open the burger menu (top left) to reach the five passages, or jump straight to the <a href="#citymap" data-close style="color:var(--gold)">city map</a>. Each passage pairs a scene from the film with the real place in Rome where it was shot, including its coordinates.</p>
-            <p>The intro screen is interactive: the minimalist hammer shatters the glittering surface and reveals the meaning beneath — the same idea the film is built on.</p>
-        </div>
-    </div>
 
     <!-- narrative modal (content filled by main.js) -->
     <div class="modal" id="modal-narrative">
@@ -483,6 +433,7 @@
         </div>
     </div>
 
-    <script src="main.js"></script>
+    <script src="data.js?v=2"></script>
+    <script src="main.js?v=2"></script>
 </body>
 </html>

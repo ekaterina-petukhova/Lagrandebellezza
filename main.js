@@ -1,163 +1,59 @@
 /* ============================================================
-   LA GRANDE BELLEZZA — interaction layer
-   Order:
-     1. Boot
-     2. Screen router (hash based)
-     3. Step indicator
-     4. Side menu (burger / labyrinth)
-     5. Modals (About / Documentation)
-     6. The crack / glass-shatter experience
-     7. Glass-break sound (Web Audio, synthesized)
-     8. Scroll reveals + progress bar
-     9. Parallax on location images
+   LA GRANDE BELLEZZA — interaction layer (LMML)
+   Locations, metadata, narratives, timeline and the multimedia
+   text grid all come from data.js; this file renders and wires them.
    ============================================================ */
 
-/* ---------- 1. Boot ---------- */
-const SCREENS = ['home', 'intro', 'loc1', 'loc2', 'loc3', 'loc4', 'loc5', 'narratives', 'citymap', 'fighter'];
-const LOCATIONS = ['loc1', 'loc2', 'loc3', 'loc4', 'loc5'];
+/* ---------- 1. Boot / derived constants ---------- */
+const LOCATION_IDS = LOCATIONS.map(l => l.id);
+const META_AFTER = ['narratives', 'timeline', 'citymap', 'fighter', 'team', 'about', 'documentation', 'disclaimer'];
+const SCREENS = ['home', 'intro', ...LOCATION_IDS, ...META_AFTER];
 
-// real Rome coordinates + a representative photo for the City map
-const ROME_PLACES = [
-    { id: 'loc1', n: 1, name: 'The Janiculum Hill', img: 'images/1location2.png', lat: 41.8898, lng: 12.4615 },
-    { id: 'loc2', n: 2, name: "Jep's Terrace & the Colosseum", img: 'images/colosseo.jpg', lat: 41.8902, lng: 12.4922 },
-    { id: 'loc3', n: 3, name: 'The Aventine Hill', img: 'images/aventine.JPG', lat: 41.8836, lng: 12.4783 },
-    { id: 'loc4', n: 4, name: 'The Baths of Caracalla', img: 'images/caracalla.JPG', lat: 41.8790, lng: 12.4925 },
-    { id: 'loc5', n: 5, name: 'Palazzo Brancaccio', img: 'images/botox2.jpg', lat: 41.8954, lng: 12.5018 }
-];
+const LOCATION_NAMES = Object.fromEntries(LOCATIONS.map(l => [l.id, l.title]));
+const ROME_PLACES = LOCATIONS.map(l => ({
+    id: l.id, n: l.n, name: l.title, img: l.img.hero, lat: l.coords.lat, lng: l.coords.lng
+}));
 
-// display names used by the narrative modal's location chips
-const LOCATION_NAMES = {
-    loc1: 'The Janiculum Hill',
-    loc2: "Jep's Terrace & the Colosseum",
-    loc3: 'The Aventine Hill',
-    loc4: 'The Baths of Caracalla',
-    loc5: 'Palazzo Brancaccio'
+/* encode image paths that contain spaces */
+const enc = p => encodeURI(p);
+
+/* thematic "lens" prose; the locations themselves are computed from
+   each place's tags in data.js, so this never falls out of sync. */
+const LENS_PROSE = {
+    'beauty-surface':  { lens: 'Theme', title: 'Beauty on the surface', text: 'The film revels in the glittering shell of Rome — the parties, the gloss, the flawlessness of emptiness. Here beauty does not conceal meaning; it replaces it.' },
+    'sacred-spiritual':{ lens: 'Theme', title: 'The sacred & the spiritual', text: 'Beneath the noise, Jep is searching for something he has lost. Rome’s churches, gardens and hidden views hold the spiritual thread the film keeps quietly reaching for.' },
+    'decadence-party': { lens: 'Theme', title: 'Decadence & the party', text: 'The “trains” of Roman high society spin through the night. The party is the stage on which vanity performs itself, dazzling and exhausted at once.' },
+    'memory-loss':     { lens: 'Theme', title: 'Memory & loss', text: 'Death opens the film and shadows it throughout. Farewells, first loves and vanished years keep surfacing between the spectacles.' },
+    'search-meaning':  { lens: 'Theme', title: 'The search for meaning', text: 'Rome is a labyrinth the protagonist wanders, trying to recover the meaning buried under decoration and pretense. Only by finding it again does he become able to write.' },
+    'illusion-trick':  { lens: 'Theme', title: 'Illusion & the trick', text: 'A giraffe disappears; faces are remade with needles. “It’s all a trick,” the magician says — and so, perhaps, is art when it loses touch with lived beauty.' },
+    'terraces':        { lens: 'Typology', title: 'Terraces & rooftops', text: 'Rome seen from above, where the city becomes a backdrop for the people who perform on it. The terrace is the film’s natural theatre.' },
+    'hills-gardens':   { lens: 'Typology', title: 'Hills & gardens', text: 'The hills and their green terraces offer the panoramic, contemplative Rome — places to look out over the city and to lose oneself among trees and cobblestones.' },
+    'ancient-ruins':   { lens: 'Typology', title: 'Ancient ruins', text: 'The monumental skeleton of imperial Rome — amphitheatre and baths — against which the small, modern dramas of the characters play out.' },
+    'palaces':         { lens: 'Typology', title: 'Palaces & interiors', text: 'Ornate historic interiors where Roman society gathers — gilded rooms that frame both refinement and its hollow imitation.' },
+    'fountains':       { lens: 'Typology', title: 'Fountains & water', text: 'Water as spectacle and as threshold — the monumental fountain that crowns the hill and opens the film.' },
+    'sacred-sites':    { lens: 'Typology', title: 'Sacred sites', text: 'Basilicas, temples and a holy staircase — the consecrated places where the film’s search for the spiritual comes closest to the surface.' }
 };
+const locationsByTag = key => LOCATIONS
+    .filter(l => l.tags.themes.includes(key) || l.tags.typology.includes(key))
+    .map(l => l.id);
 
-/* The narrative threads. Each ties a reading of the film to the real
-   Roman locations it surfaces in — so a single place can belong to
-   several themes, types and centuries at once. */
-const NARRATIVES = {
-    /* --- Lens 01 · Themes --- */
-    'beauty-surface': {
-        lens: 'Theme',
-        title: 'Beauty on the surface',
-        text: 'The film revels in the glittering shell of Rome — the parties, the gloss, the flawlessness of emptiness. Here beauty does not conceal meaning; it replaces it. These are the places where the surface shines brightest.',
-        locations: ['loc2', 'loc5', 'loc1']
-    },
-    'sacred-spiritual': {
-        lens: 'Theme',
-        title: 'The sacred & the spiritual',
-        text: 'Beneath the noise, Jep is searching for something he has lost. Rome’s churches, cloisters and hidden views hold the spiritual thread the film keeps quietly reaching for.',
-        locations: ['loc3', 'loc1']
-    },
-    'decadence-party': {
-        lens: 'Theme',
-        title: 'Decadence & the party',
-        text: 'The “trains” of Roman high society spin through the night. The party is the stage on which vanity performs itself, dazzling and exhausted at once.',
-        locations: ['loc2', 'loc5']
-    },
-    'memory-loss': {
-        lens: 'Theme',
-        title: 'Memory & loss',
-        text: 'Death opens the film and shadows it throughout. Farewells, first loves and vanished years keep surfacing between the spectacles.',
-        locations: ['loc4', 'loc1']
-    },
-    'search-meaning': {
-        lens: 'Theme',
-        title: 'The search for meaning',
-        text: 'Rome is a labyrinth the protagonist wanders, trying to recover the meaning buried under decoration and pretense. Only by finding it again does he become able to write.',
-        locations: ['loc1', 'loc3', 'loc4']
-    },
-    'illusion-trick': {
-        lens: 'Theme',
-        title: 'Illusion & the trick',
-        text: 'A giraffe disappears; faces are remade with needles. “It’s all a trick,” the magician says — and so, perhaps, is art when it loses touch with lived beauty.',
-        locations: ['loc4', 'loc5']
-    },
-
-    /* --- Lens 02 · Typology --- */
-    'terraces': {
-        lens: 'Typology',
-        title: 'Terraces & rooftops',
-        text: 'Rome seen from above, where the city becomes a backdrop for the people who perform on it. The terrace is the film’s natural theatre.',
-        locations: ['loc2']
-    },
-    'hills-gardens': {
-        lens: 'Typology',
-        title: 'Hills & gardens',
-        text: 'The seven hills and their green terraces offer the panoramic, contemplative Rome — places to look out over the city and to lose oneself among trees and cobblestones.',
-        locations: ['loc1', 'loc3']
-    },
-    'ancient-ruins': {
-        lens: 'Typology',
-        title: 'Ancient ruins',
-        text: 'The monumental skeleton of imperial Rome — amphitheatres and baths — against which the small, modern dramas of the characters play out.',
-        locations: ['loc2', 'loc4']
-    },
-    'palaces': {
-        lens: 'Typology',
-        title: 'Palaces & interiors',
-        text: 'Ornate historic interiors where Roman society gathers — gilded rooms that frame both refinement and its hollow imitation.',
-        locations: ['loc5']
-    },
-    'fountains': {
-        lens: 'Typology',
-        title: 'Fountains & water',
-        text: 'Water as spectacle and as stillness — the monumental fountains that crown the hills and mark the city’s quiet thresholds.',
-        locations: ['loc1']
-    },
-    'sacred-sites': {
-        lens: 'Typology',
-        title: 'Sacred sites',
-        text: 'Basilicas, cloisters and the famous keyhole — the consecrated places where the film’s search for the spiritual comes closest to the surface.',
-        locations: ['loc3']
-    },
-
-    /* --- Lens 03 · Through the centuries --- */
-    'ancient': {
-        lens: 'I–III century',
-        title: 'Ancient Rome',
-        text: 'Imperial Rome built to overwhelm: the Colosseum (completed c. 80 AD) and the colossal Baths of Caracalla (216 AD). Their ruins still set the scale for everything the film stages within them.',
-        locations: ['loc2', 'loc4']
-    },
-    'early-christian': {
-        lens: 'V century',
-        title: 'Early Christian Rome',
-        text: 'The Basilica of Santa Sabina on the Aventine (422–432 AD) carries the austere, contemplative faith that survives under the city’s later glamour.',
-        locations: ['loc3']
-    },
-    'baroque': {
-        lens: 'XVII century',
-        title: 'Baroque Rome',
-        text: 'The Fontana dell’Acqua Paola (1610–1612) crowns the Janiculum — the theatrical, water-drunk Rome of the Baroque, built to be admired from afar.',
-        locations: ['loc1']
-    },
-    'enlightenment': {
-        lens: 'XVIII century',
-        title: 'The Enlightenment',
-        text: 'Piranesi’s walled garden of the Priory of Malta (1765), with its keyhole framing St. Peter’s dome — a scholar’s witty, scenographic idea of beauty.',
-        locations: ['loc3']
-    },
-    'belle-epoque': {
-        lens: 'XIX century',
-        title: 'Belle Époque Rome',
-        text: 'The Rome of the new capital: the Janiculum promenade and Palazzo Brancaccio (1880s), the last great noble palace built in the city — grandeur on the eve of the modern world.',
-        locations: ['loc5', 'loc1']
-    },
-    'contemporary': {
-        lens: '2013',
-        title: 'Contemporary Rome',
-        text: 'Sorrentino’s present-day Rome gathers all of these centuries into a single restless night. Every location becomes a room in the same labyrinth.',
-        locations: ['loc1', 'loc2', 'loc3', 'loc4', 'loc5']
-    }
-};
+/* ---------- multimedia-grid state (depth × audience) ---------- */
+let textDepth = localStorage.getItem('lgb-depth') || 'medium';
+let textAud   = localStorage.getItem('lgb-aud')   || 'adult';
 
 document.addEventListener('DOMContentLoaded', () => {
+    renderLocations();          // build the 13 location screens from data
+    renderSideMenu();
+    renderNarratives();
+    renderTimeline();
+    renderItinerary();
+
     buildStepDots();
     initRouter();
     initSideMenu();
     initModals();
+    initThemes();
+    initTextControls();
     initNarratives();
     initFighter();
     initQuiz();
@@ -167,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initParallax();
     initFooterWatch();
 
-    // honour any deep link, else land on home
     const start = (location.hash || '').replace('#', '');
     showScreen(SCREENS.includes(start) ? start : 'home', true);
 });
@@ -180,22 +75,17 @@ function showScreen(id, instant) {
     const el = document.getElementById(id);
     el.classList.add('active');
 
-    if (location.hash !== '#' + id) {
-        history.replaceState(null, '', '#' + id);
-    }
-
+    if (location.hash !== '#' + id) history.replaceState(null, '', '#' + id);
     window.scrollTo({ top: 0, behavior: instant ? 'auto' : 'smooth' });
 
     updateStepIndicator(el);
     syncMenuActive(id);
     refreshReveals(el);
 
-    // the Rome map needs a visible, sized container to render
     if (id === 'citymap') setTimeout(initRomeMap, 60);
 }
 
 function initRouter() {
-    // any element with data-go drives the router
     document.body.addEventListener('click', e => {
         const goEl = e.target.closest('[data-go]');
         if (goEl) {
@@ -203,10 +93,10 @@ function initRouter() {
             showScreen(goEl.dataset.go);
             closeMenu();
             closeModals();
+            return;
         }
-        // in-page anchor links (#home, #intro, #loc1 ...)
         const link = e.target.closest('a[href^="#"]');
-        if (link && !goEl) {
+        if (link) {
             const target = link.getAttribute('href').slice(1);
             if (SCREENS.includes(target)) {
                 e.preventDefault();
@@ -233,19 +123,16 @@ function buildStepDots() {
 function updateStepIndicator(screenEl) {
     const indicator = document.getElementById('stepIndicator');
     const step = screenEl.dataset.step;
-
-    if (!step) {
-        indicator.classList.remove('show');
-        return;
-    }
+    if (!step) { indicator.classList.remove('show'); return; }
 
     const idx = parseInt(step, 10);
+    const total = String(LOCATIONS.length).padStart(2, '0');
     indicator.classList.add('show');
     document.querySelectorAll('#stepDots .dot').forEach((d, i) => {
         d.classList.toggle('on', i === idx - 1);
     });
     document.getElementById('stepLabel').innerHTML =
-        String(idx).padStart(2, '0') + ' / 05 · ' + screenEl.dataset.name;
+        String(idx).padStart(2, '0') + ' / ' + total + ' · ' + screenEl.dataset.name;
 }
 
 /* ---------- 4. Side menu ---------- */
@@ -256,10 +143,15 @@ function initSideMenu() {
         if (e.key === 'Escape') { closeMenu(); closeModals(); }
     });
 }
-
+function renderSideMenu() {
+    const wrap = document.getElementById('sideMenuList');
+    if (!wrap) return;
+    wrap.innerHTML = LOCATIONS.map(l =>
+        `<div class="menu-item" data-go="${l.id}"><span class="num">${String(l.n).padStart(2, '0')}</span><span class="name">${l.title}</span></div>`
+    ).join('');
+}
 function toggleMenu() { document.body.classList.toggle('menu-open'); }
 function closeMenu() { document.body.classList.remove('menu-open'); }
-
 function syncMenuActive(id) {
     document.querySelectorAll('.menu-item').forEach(m => {
         m.classList.toggle('active', m.dataset.go === id);
@@ -274,43 +166,244 @@ function initModals() {
             if (m) m.classList.add('open');
         });
     });
-    document.querySelectorAll('[data-close]').forEach(el => {
-        el.addEventListener('click', closeModals);
-    });
+    document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeModals));
 }
-
 function closeModals() {
     document.querySelectorAll('.modal.open').forEach(m => m.classList.remove('open'));
 }
 
-/* ---------- 5b. Narratives ---------- */
+/* ---------- 6. Themes (switchable graphic / typographic) ---------- */
+function initThemes() {
+    const saved = localStorage.getItem('lgb-theme') || 'notte';
+    applyTheme(saved);
+
+    const toggle = document.getElementById('themeToggle');
+    const panel  = document.getElementById('themePanel');
+    if (toggle && panel) {
+        toggle.addEventListener('click', e => {
+            e.stopPropagation();
+            panel.classList.toggle('open');
+        });
+        document.addEventListener('click', () => panel.classList.remove('open'));
+        panel.addEventListener('click', e => e.stopPropagation());
+    }
+    document.querySelectorAll('[data-theme-set]').forEach(b => {
+        b.addEventListener('click', () => { applyTheme(b.dataset.themeSet); if (panel) panel.classList.remove('open'); });
+    });
+}
+function applyTheme(id) {
+    document.documentElement.setAttribute('data-theme', id);
+    localStorage.setItem('lgb-theme', id);
+    document.querySelectorAll('[data-theme-set]').forEach(b => b.classList.toggle('on', b.dataset.themeSet === id));
+    const cur = document.getElementById('themeCurrent');
+    if (cur) { const t = THEMES.find(x => x.id === id); cur.textContent = t ? t.label : id; }
+    // recolour the map route if the map already exists
+    if (typeof romeMap !== 'undefined' && romeMap && routeLine) {
+        routeLine.setStyle({ color: accentColor() });
+    }
+}
+const accentColor = () => getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() || '#fecc2a';
+
+/* ---------- 7. Locations: render from data ---------- */
+function renderLocations() {
+    const host = document.getElementById('locationScreens');
+    host.innerHTML = LOCATIONS.map((loc, i) => locationSectionHTML(loc, i)).join('');
+    LOCATIONS.forEach(l => renderLocationText(l.id));
+}
+
+function locationSectionHTML(loc, i) {
+    const prev = i === 0
+        ? { go: 'intro', dir: '← Back', dest: 'The exhibition' }
+        : { go: LOCATIONS[i - 1].id, dir: '← Previous', dest: LOCATIONS[i - 1].title };
+    const next = i === LOCATIONS.length - 1
+        ? { go: 'citymap', dir: 'The whole map →', dest: 'Map & one-day itinerary' }
+        : { go: LOCATIONS[i + 1].id, dir: 'Next passage →', dest: LOCATIONS[i + 1].title };
+
+    const gallery = [loc.img.hero, ...(loc.img.gallery || [])];
+    const galleryHTML = gallery.map((src, k) => `
+        <figure><img${k === 0 ? ' data-parallax' : ''} src="${enc(src)}" alt="${loc.title}">
+            <figcaption>${loc.title}</figcaption></figure>`).join('');
+    const single = gallery.length < 2 ? ' single' : '';
+
+    const dt = loc.dcterms;
+    const metaRows = `
+        <tr><td class="meta-prop">Director</td><td class="meta-val">Paolo Sorrentino</td></tr>
+        <tr><td class="meta-prop">Film year</td><td class="meta-val">2013</td></tr>
+        <tr><td class="meta-prop">Scene timestamp</td><td class="meta-val">${loc.scene.timestamp} — ${loc.scene.depictedAs}</td></tr>
+        <tr><td class="meta-prop">Real location</td><td class="meta-val">${loc.realPlace}</td></tr>
+        <tr><td class="meta-prop">Address</td><td class="meta-val">${loc.address}</td></tr>
+        <tr><td class="meta-prop">Camera orientation</td><td class="meta-val">${loc.camera}</td></tr>
+        <tr class="dc"><td class="meta-prop">dcterms:title</td><td class="meta-val">${dt.title}</td></tr>
+        <tr class="dc"><td class="meta-prop">dcterms:subject</td><td class="meta-val">${dt.subject}</td></tr>
+        <tr class="dc"><td class="meta-prop">dcterms:spatial</td><td class="meta-val">${dt.spatial}</td></tr>
+        <tr class="dc"><td class="meta-prop">dcterms:temporal</td><td class="meta-val">${dt.temporal}</td></tr>
+        <tr class="dc"><td class="meta-prop">dcterms:type</td><td class="meta-val">${dt.type}</td></tr>`;
+
+    return `
+    <section class="screen location" id="${loc.id}" data-step="${loc.n}" data-name="${loc.title}">
+        <div class="loc-hero">
+            <img class="loc-img" data-parallax src="${enc(loc.img.hero)}" alt="${loc.title}">
+            <div class="loc-hero-text">
+                <span class="kicker reveal">${loc.kicker}</span>
+                <h2 class="loc-title reveal">${loc.title}</h2>
+            </div>
+        </div>
+        <div class="loc-body">
+            <div class="loc-meta reveal">
+                <div class="meta-item"><div class="meta-k">Coordinates</div><div class="meta-v">${dt.spatial}</div></div>
+                <div class="meta-item"><div class="meta-k">Era</div><div class="meta-v">${loc.era.period} · ${loc.era.century}</div></div>
+                <div class="meta-item"><div class="meta-k">Scene</div><div class="meta-v">${loc.scene.timestamp}</div></div>
+            </div>
+
+            <div class="text-controls reveal" role="group" aria-label="Adapt the text">
+                <div class="tc-group">
+                    <span class="tc-label">Depth</span>
+                    ${DEPTHS.map(d => `<button class="tc-btn" data-depth="${d.id}" title="${d.note}">${d.label}</button>`).join('')}
+                </div>
+                <div class="tc-group">
+                    <span class="tc-label">Audience</span>
+                    ${AUDIENCES.map(a => `<button class="tc-btn" data-aud="${a.id}" title="${a.note}">${a.label}</button>`).join('')}
+                </div>
+            </div>
+
+            <div class="loc-prose reveal" id="prose-${loc.id}"></div>
+
+            <div class="loc-gallery${single} reveal">${galleryHTML}</div>
+
+            <div class="loc-about reveal">
+                <h3 class="about-title">About this location</h3>
+                <p class="about-lead"><span class="lead">${loc.realPlace}.</span> ${loc.era.period} · ${loc.era.century}${loc.era.year ? ' (' + loc.era.year + ')' : ''}.</p>
+                <h4 class="meta-table-title">Metadata</h4>
+                <table class="meta-table">
+                    <thead><tr><th>Property</th><th>Value</th></tr></thead>
+                    <tbody>${metaRows}</tbody>
+                </table>
+            </div>
+        </div>
+        <nav class="loc-nav">
+            <a data-go="${prev.go}"><span class="dir">${prev.dir}</span><span class="dest">${prev.dest}</span></a>
+            <a class="next" data-go="${next.go}"><span class="dir">${next.dir}</span><span class="dest">${next.dest}</span></a>
+        </nav>
+    </section>`;
+}
+
+/* ---------- 7b. The multimedia text grid (depth × audience) ---------- */
+function initTextControls() {
+    document.body.addEventListener('click', e => {
+        const d = e.target.closest('[data-depth]');
+        if (d) { textDepth = d.dataset.depth; localStorage.setItem('lgb-depth', textDepth); refreshAllTexts(); syncTextControls(); return; }
+        const a = e.target.closest('[data-aud]');
+        if (a) { textAud = a.dataset.aud; localStorage.setItem('lgb-aud', textAud); refreshAllTexts(); syncTextControls(); }
+    });
+    syncTextControls();
+}
+function refreshAllTexts() { LOCATIONS.forEach(l => renderLocationText(l.id)); }
+function renderLocationText(id) {
+    const loc = LOCATIONS.find(l => l.id === id);
+    const el = document.getElementById('prose-' + id);
+    if (!loc || !el) return;
+    const txt = (loc.texts[textAud] && loc.texts[textAud][textDepth]) || '';
+    el.innerHTML = `<p class="firstcap"><span class="lead"></span>${txt}</p>`;
+}
+function syncTextControls() {
+    document.querySelectorAll('[data-depth]').forEach(b => b.classList.toggle('on', b.dataset.depth === textDepth));
+    document.querySelectorAll('[data-aud]').forEach(b => b.classList.toggle('on', b.dataset.aud === textAud));
+}
+
+/* ---------- 8. Narratives: guided routes + thematic lenses ---------- */
+function renderNarratives() {
+    const wrap = document.getElementById('guidedNarr');
+    if (wrap) {
+        wrap.innerHTML = NARRATIVES_GUIDED.map(n => `
+            <article class="narr-card reveal">
+                <p class="narr-card-kind">${n.kind}</p>
+                <h3 class="narr-card-title">${n.title}</h3>
+                <p class="narr-card-blurb">${n.blurb}</p>
+                <p class="narr-card-meta">${n.stops.length} stops</p>
+                <button class="btn btn-ghost" data-narr-guided="${n.id}">Open the route <span class="arrow">→</span></button>
+            </article>`).join('');
+    }
+}
+
 function initNarratives() {
     document.querySelectorAll('.narr-tag').forEach(btn => {
-        btn.addEventListener('click', () => openNarrative(btn.dataset.narr));
+        btn.addEventListener('click', () => openLens(btn.dataset.narr));
+    });
+    document.body.addEventListener('click', e => {
+        const g = e.target.closest('[data-narr-guided]');
+        if (g) openGuided(g.dataset.narrGuided);
     });
 }
 
-function openNarrative(key) {
-    const n = NARRATIVES[key];
+function openLens(key) {
+    const n = LENS_PROSE[key];
     if (!n) return;
-
+    const ids = locationsByTag(key);
     document.getElementById('narrLens').textContent = n.lens;
     document.getElementById('narrTitle').textContent = n.title;
     document.getElementById('narrText').textContent = n.text;
-
-    // build clickable location chips that jump straight into the labyrinth
-    const wrap = document.getElementById('narrRelations');
-    wrap.innerHTML = n.locations.map(id => {
-        const step = String(LOCATIONS.indexOf(id) + 1).padStart(2, '0');
-        return `<button class="rel-chip" data-go="${id}">
-                    <span class="rc-num">${step}</span>${LOCATION_NAMES[id]}
-                </button>`;
+    document.querySelector('#modal-narrative .rel-label').textContent = 'Follow the thread to these places';
+    document.getElementById('narrRelations').innerHTML = ids.map(id => {
+        const l = LOCATIONS.find(x => x.id === id);
+        return `<button class="rel-chip" data-go="${id}"><span class="rc-num">${String(l.n).padStart(2, '0')}</span>${l.title}</button>`;
     }).join('');
-
     document.getElementById('modal-narrative').classList.add('open');
 }
 
-/* ---------- 5c. Choose your fighter — character graph ---------- */
+function openGuided(id) {
+    const n = NARRATIVES_GUIDED.find(x => x.id === id);
+    if (!n) return;
+    document.getElementById('narrLens').textContent = n.kind;
+    document.getElementById('narrTitle').textContent = n.title;
+    document.getElementById('narrText').textContent = n.blurb;
+    document.querySelector('#modal-narrative .rel-label').textContent = 'The route, in order — tap a stop to begin';
+    document.getElementById('narrRelations').innerHTML = n.stops.map((sid, k) => {
+        const l = LOCATIONS.find(x => x.id === sid);
+        return `<button class="rel-chip" data-go="${sid}"><span class="rc-num">${String(k + 1).padStart(2, '0')}</span>${l.title}</button>`;
+    }).join('');
+    document.getElementById('modal-narrative').classList.add('open');
+}
+
+/* ---------- 8b. Historical timeline ---------- */
+function renderTimeline() {
+    const wrap = document.getElementById('timelineTrack');
+    if (!wrap) return;
+    wrap.innerHTML = ERAS.map(e => `
+        <div class="era reveal">
+            <div class="era-marker"><span class="era-dot"></span></div>
+            <div class="era-body">
+                <p class="era-span">${e.span}</p>
+                <h3 class="era-label">${e.label}</h3>
+                <div class="era-locs">
+                    ${e.locations.map(id => {
+                        const l = LOCATIONS.find(x => x.id === id);
+                        return `<button class="era-loc" data-go="${id}">
+                            <img src="${enc(l.img.hero)}" alt="">
+                            <span class="era-loc-cap"><b>${String(l.n).padStart(2, '0')}</b> ${l.title}</span>
+                        </button>`;
+                    }).join('')}
+                </div>
+            </div>
+        </div>`).join('');
+}
+
+/* ---------- 8c. One-day itinerary list (next to the map) ---------- */
+function renderItinerary() {
+    const wrap = document.getElementById('itineraryList');
+    if (!wrap) return;
+    wrap.innerHTML = LOCATIONS.map((l, i) => `
+        <li class="itin-step reveal">
+            <button class="itin-go" data-go="${l.id}">
+                <span class="itin-num">${String(l.n).padStart(2, '0')}</span>
+                <span class="itin-info">
+                    <span class="itin-name">${l.title}</span>
+                    <span class="itin-sub">${l.cluster}${i < LOCATIONS.length - 1 ? ' · ' + l.walkToNext : ''}</span>
+                </span>
+            </button>
+        </li>`).join('');
+}
+
+/* ---------- 9. Choose your fighter — character graph ---------- */
 const CHARACTERS = {
     jep: {
         name: 'Jep Gambardella',
@@ -454,18 +547,13 @@ function initFighter() {
     const nodes = document.querySelectorAll('.char-node');
     if (!nodes.length) return;
     nodes.forEach(n => n.addEventListener('click', () => showCharacter(n.dataset.char)));
-    showCharacter('jep'); // default
+    showCharacter('jep');
 }
-
 function showCharacter(key) {
     const c = CHARACTERS[key];
     const panel = document.getElementById('charDetail');
     if (!c || !panel) return;
-
-    document.querySelectorAll('.char-node').forEach(n => {
-        n.classList.toggle('active', n.dataset.char === key);
-    });
-
+    document.querySelectorAll('.char-node').forEach(n => n.classList.toggle('active', n.dataset.char === key));
     panel.innerHTML = `
         <p class="cd-role">${c.role}</p>
         <h3 class="cd-name">${c.name}</h3>
@@ -473,14 +561,13 @@ function showCharacter(key) {
         <p class="cd-block-label">Significant scenes</p>
         <ul class="cd-scenes">${c.scenes.map(s => `<li>${s}</li>`).join('')}</ul>
         <p class="cd-block-label">Lines that linger</p>
-        <div class="cd-quotes">${c.quotes.map(q => `<p class="cd-quote">${q}</p>`).join('')}</div>
-    `;
+        <div class="cd-quotes">${c.quotes.map(q => `<p class="cd-quote">${q}</p>`).join('')}</div>`;
     panel.classList.remove('swap');
     void panel.offsetWidth;
     panel.classList.add('swap');
 }
 
-/* ---------- 5d. The quiz — "Who are you in The Great Beauty?" ---------- */
+/* ---------- 9b. The quiz ---------- */
 const QUIZ = [
     {
         q: 'How do you usually behave at large social events or parties?',
@@ -560,7 +647,6 @@ const quizAnswers = {};
 function initQuiz() {
     const wrap = document.getElementById('quizQuestions');
     if (!wrap) return;
-
     wrap.innerHTML = QUIZ.map((item, i) => `
         <div class="quiz-q" data-i="${i}">
             <p class="quiz-q-num">${String(i + 1).padStart(2, '0')} / 05</p>
@@ -573,37 +659,26 @@ function initQuiz() {
                     </button>`).join('')}
             </div>
         </div>`).join('');
-
-    wrap.querySelectorAll('.quiz-opt').forEach(btn => {
-        btn.addEventListener('click', () => selectOption(btn));
-    });
-
+    wrap.querySelectorAll('.quiz-opt').forEach(btn => btn.addEventListener('click', () => selectOption(btn)));
     document.getElementById('quizReveal').addEventListener('click', revealResult);
 }
-
 function selectOption(btn) {
     const q = btn.dataset.q;
-    // single choice per question
     document.querySelectorAll(`.quiz-opt[data-q="${q}"]`).forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     quizAnswers[q] = btn.dataset.letter;
-
     const answered = Object.keys(quizAnswers).length;
     document.getElementById('quizProgress').textContent = answered + ' / 5 answered';
     document.getElementById('quizReveal').disabled = answered < QUIZ.length;
 }
-
 function revealResult() {
-    // tally the letters, break ties by A→E order
     const counts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
     Object.values(quizAnswers).forEach(l => counts[l]++);
     let best = 'A';
     LETTERS.forEach(l => { if (counts[l] > counts[best]) best = l; });
-
     const key = QUIZ_KEY[best];
     const c = CHARACTERS[key];
     const box = document.getElementById('quizResult');
-
     box.innerHTML = `
         <img class="result-img" src="${c.img}" alt="${c.name}">
         <div class="result-body">
@@ -618,14 +693,12 @@ function revealResult() {
         </div>`;
     box.hidden = false;
     box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
     document.getElementById('resultMeet').addEventListener('click', () => {
         showCharacter(key);
         document.querySelector('#fighter .constellation').scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
     document.getElementById('quizRetake').addEventListener('click', resetQuiz);
 }
-
 function resetQuiz() {
     Object.keys(quizAnswers).forEach(k => delete quizAnswers[k]);
     document.querySelectorAll('.quiz-opt.selected').forEach(b => b.classList.remove('selected'));
@@ -637,74 +710,47 @@ function resetQuiz() {
     document.querySelector('.quiz-head').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-/* ---------- 6. The crack / glass-shatter experience ---------- */
+/* ---------- 10. The crack / glass-shatter experience ---------- */
 function initCrackExperience() {
     const stage = document.getElementById('crackStage');
     const btn = document.getElementById('hammerBtn');
     const svg = document.getElementById('crackSvg');
     const flash = document.getElementById('flash');
     if (!stage || !btn) return;
-
     let used = false;
-
     btn.addEventListener('click', () => {
         if (used) return;
         used = true;
-
-        // 1. swing the hammer
         btn.classList.add('swing');
-
-        // 2. impact a beat later: shake + flash + sound + draw cracks
         setTimeout(() => {
             playGlassBreak();
             stage.classList.add('shake');
             flash.classList.add('go');
             drawCracks(svg);
-            stage.classList.add('shattered');   // cracks appear, old text fades, bg swaps
+            stage.classList.add('shattered');
         }, 230);
-
-        // 3. settle onto the intact "after" screen, then dissolve the cracks
-        setTimeout(() => {
-            stage.classList.remove('shake');
-        }, 900);
-
-        setTimeout(() => {
-            stage.classList.add('healed');       // reveal after-text, fade cracks out
-        }, 1400);
+        setTimeout(() => stage.classList.remove('shake'), 900);
+        setTimeout(() => stage.classList.add('healed'), 1400);
     });
 }
-
-/* Procedurally draw a pane of cracked glass into the SVG. */
 function drawCracks(svg) {
-    const W = window.innerWidth;
-    const H = window.innerHeight;
+    const W = window.innerWidth, H = window.innerHeight;
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.innerHTML = '';
-
-    const cx = W * 0.5;
-    const cy = H * 0.48;
+    const cx = W * 0.5, cy = H * 0.48;
     const NS = 'http://www.w3.org/2000/svg';
     const paths = [];
-
     const point = (ang, r) => [cx + Math.cos(ang) * r, cy + Math.sin(ang) * r];
-
-    // jagged line between two points, returned as an SVG "d" string
     const jagged = (x1, y1, x2, y2, segs, jit) => {
         let d = `M ${x1.toFixed(1)} ${y1.toFixed(1)}`;
         for (let i = 1; i <= segs; i++) {
             const t = i / segs;
-            let x = x1 + (x2 - x1) * t;
-            let y = y1 + (y2 - y1) * t;
-            if (i < segs) {
-                x += (Math.random() - 0.5) * jit;
-                y += (Math.random() - 0.5) * jit;
-            }
+            let x = x1 + (x2 - x1) * t, y = y1 + (y2 - y1) * t;
+            if (i < segs) { x += (Math.random() - 0.5) * jit; y += (Math.random() - 0.5) * jit; }
             d += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
         }
         return d;
     };
-
-    // main radial fractures
     const rays = 11 + Math.floor(Math.random() * 4);
     const angles = [];
     const maxR = Math.hypot(W, H);
@@ -714,8 +760,6 @@ function drawCracks(svg) {
         const len = maxR * (0.55 + Math.random() * 0.5);
         const [ex, ey] = point(ang, len);
         paths.push({ d: jagged(cx, cy, ex, ey, 7, 26), w: 1.4 });
-
-        // small branch offshoots
         if (Math.random() > 0.45) {
             const br = len * (0.35 + Math.random() * 0.35);
             const [bx, by] = point(ang, br);
@@ -723,54 +767,40 @@ function drawCracks(svg) {
             paths.push({ d: jagged(bx, by, tx, ty, 4, 18), w: 0.8 });
         }
     }
-
-    // concentric web rings linking the radials
     const rings = [60, 130, 230, 360];
     rings.forEach(r => {
         for (let i = 0; i < angles.length; i++) {
-            const a1 = angles[i];
-            const a2 = angles[(i + 1) % angles.length];
+            const a1 = angles[i], a2 = angles[(i + 1) % angles.length];
             const rr = r * (0.85 + Math.random() * 0.3);
             const [x1, y1] = point(a1, rr);
             const [x2, y2] = point(a2, rr);
             paths.push({ d: jagged(x1, y1, x2, y2, 3, 14), w: 0.7 });
         }
     });
-
-    // build, measure, and stagger-animate each fracture
     paths.forEach((p, i) => {
         const el = document.createElementNS(NS, 'path');
         el.setAttribute('d', p.d);
         el.setAttribute('class', 'crack-line');
         el.style.strokeWidth = p.w;
         svg.appendChild(el);
-
         const len = el.getTotalLength();
         el.style.strokeDasharray = len;
         el.style.strokeDashoffset = len;
         el.style.transition = `stroke-dashoffset 0.5s cubic-bezier(0.2,0.8,0.2,1) ${i * 0.012}s`;
-        // next frame -> draw in
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            el.style.strokeDashoffset = 0;
-        }));
+        requestAnimationFrame(() => requestAnimationFrame(() => { el.style.strokeDashoffset = 0; }));
     });
 }
 
-/* ---------- 7. Glass-break sound (synthesized, no asset needed) ---------- */
+/* ---------- 11. Glass-break sound (synthesized) ---------- */
 let audioCtx = null;
 function playGlassBreak() {
     try {
         audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-        const ctx = audioCtx;
-        const now = ctx.currentTime;
-
-        // a) sharp noise burst = the shatter
+        const ctx = audioCtx, now = ctx.currentTime;
         const dur = 0.6;
         const buffer = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
         const data = buffer.getChannelData(0);
-        for (let i = 0; i < data.length; i++) {
-            data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2.4);
-        }
+        for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2.4);
         const noise = ctx.createBufferSource();
         noise.buffer = buffer;
         const hp = ctx.createBiquadFilter();
@@ -780,8 +810,6 @@ function playGlassBreak() {
         ng.gain.value = 0.35;
         noise.connect(hp).connect(ng).connect(ctx.destination);
         noise.start(now);
-
-        // b) a few high "tinkles" = falling shards
         [2400, 3100, 4200, 5200].forEach((f, i) => {
             const osc = ctx.createOscillator();
             const g = ctx.createGain();
@@ -795,36 +823,26 @@ function playGlassBreak() {
             osc.start(t);
             osc.stop(t + 0.3);
         });
-    } catch (e) {
-        /* audio is a nicety; ignore failures */
-    }
+    } catch (e) { /* audio is a nicety */ }
 }
 
-/* ---------- 8. Scroll reveals + progress bar ---------- */
+/* ---------- 12. Scroll reveals + progress ---------- */
 let revealObserver;
 function initReveals() {
     revealObserver = new IntersectionObserver(entries => {
         entries.forEach(en => {
-            if (en.isIntersecting) {
-                en.target.classList.add('in');
-                revealObserver.unobserve(en.target);
-            }
+            if (en.isIntersecting) { en.target.classList.add('in'); revealObserver.unobserve(en.target); }
         });
     }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 }
-
-// when a screen activates, (re)observe its reveal items
 function refreshReveals(screenEl) {
     screenEl.querySelectorAll('.reveal:not(.in)').forEach(el => {
         revealObserver.observe(el);
-        // anything already in view on load gets revealed immediately
         const r = el.getBoundingClientRect();
         if (r.top < window.innerHeight * 0.95) el.classList.add('in');
     });
 }
-
 function initProgress() {
     const bar = document.getElementById('progress');
     const onScroll = () => {
@@ -834,8 +852,6 @@ function initProgress() {
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
 }
-
-/* hide the step pill once the footer comes into view */
 function initFooterWatch() {
     const footer = document.querySelector('.site-footer');
     const indicator = document.getElementById('stepIndicator');
@@ -845,65 +861,50 @@ function initFooterWatch() {
     }, { threshold: 0 }).observe(footer);
 }
 
-/* ---------- 8b. Interactive Rome map (Leaflet) ---------- */
+/* ---------- 13. Interactive Rome map + one-day route ---------- */
 let romeMap = null;
+let routeLine = null;
 function initRomeMap() {
     const el = document.getElementById('romeMap');
     if (!el || typeof L === 'undefined') return;
+    if (romeMap) { romeMap.invalidateSize(); return; }
 
-    // already built — just make sure it's sized correctly
-    if (romeMap) {
-        romeMap.invalidateSize();
-        return;
-    }
-
-    romeMap = L.map(el, {
-        scrollWheelZoom: false,   // let the page scroll naturally
-        zoomControl: true,
-        attributionControl: true
-    });
-
-    // dark, editorial basemap that matches the site
+    romeMap = L.map(el, { scrollWheelZoom: false, zoomControl: true, attributionControl: true });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+    }).addTo(romeMap);
+
+    // the one-day itinerary, drawn as an ordered route
+    routeLine = L.polyline(ROME_PLACES.map(p => [p.lat, p.lng]), {
+        color: accentColor(), weight: 2.5, opacity: 0.65, dashArray: '1 9', lineCap: 'round'
     }).addTo(romeMap);
 
     const markers = ROME_PLACES.map(p => {
         const icon = L.divIcon({
             className: 'rome-marker',
             html: `<span class="rm-dot">${p.n}</span>`,
-            iconSize: [34, 34],
-            iconAnchor: [17, 17]
+            iconSize: [34, 34], iconAnchor: [17, 17]
         });
         const marker = L.marker([p.lat, p.lng], { icon }).addTo(romeMap);
-
         const num = String(p.n).padStart(2, '0');
         marker.bindTooltip(
-            `<div class="rome-tip-inner">
-                <img src="${p.img}" alt="">
-                <span class="rome-tip-cap"><b>${num}</b>${p.name}</span>
-             </div>`,
+            `<div class="rome-tip-inner"><img src="${enc(p.img)}" alt="">
+                <span class="rome-tip-cap"><b>${num}</b>${p.name}</span></div>`,
             { direction: 'top', offset: [0, -16], className: 'rome-tip', opacity: 1 }
         );
-
         marker.on('click', () => { showScreen(p.id); closeMenu(); });
         return marker;
     });
 
-    // frame all five places nicely
-    romeMap.fitBounds(L.featureGroup(markers).getBounds().pad(0.35));
+    romeMap.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
     setTimeout(() => romeMap.invalidateSize(), 200);
-
-    // keep the map correctly sized when the window changes
     window.addEventListener('resize', () => {
-        if (romeMap && document.getElementById('citymap').classList.contains('active')) {
-            romeMap.invalidateSize();
-        }
+        if (romeMap && document.getElementById('citymap').classList.contains('active')) romeMap.invalidateSize();
     });
 }
 
-/* ---------- 9. Parallax on location images ---------- */
+/* ---------- 14. Parallax on location images ---------- */
 function initParallax() {
     let ticking = false;
     const update = () => {
