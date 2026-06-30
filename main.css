@@ -127,54 +127,26 @@ a {
     transition: color 0.35s var(--ease);
 }
 
-/* the "Narratives" entry gets a quiet gold accent so it reads as the new page */
-.nav-links .nav-narr {
-    color: var(--gold);
-}
-
-/* explicit "back to start" control, top-left by convention */
-.nav-links .nav-home {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-}
-
-.nav-links .nav-home .home-ico {
-    width: 17px;
-    height: 17px;
-    transition: transform 0.4s var(--ease);
-}
-
-.nav-links .nav-home:hover .home-ico {
-    transform: translateY(-2px);
-}
-
-/* animated underline */
-.nav-links a::after,
-.nav-links button::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0;
-    height: 1px;
-    background: var(--gold);
-    transition: width 0.4s var(--ease);
-}
-
-.nav-links a:hover,
 .nav-links button:hover {
     color: var(--gold);
 }
-
 .nav-links a:hover::after,
 .nav-links button:hover::after {
     width: 100%;
 }
 
+.nav-links a.active,
+.nav-links button.active {
+    color: var(--gold);
+}
+.nav-links a.active::after,
+.nav-links button.active::after {
+    width: 100%;
+}
+
 .nav-logo {
-    display: flex;
-    align-items: center;
+display: flex;
+align-items: center;
 }
 
 .nav-logo img {
