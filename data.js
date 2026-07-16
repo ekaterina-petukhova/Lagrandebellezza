@@ -1,15 +1,4 @@
-/* ============================================================
-   LA GRANDE BELLEZZA — content & data layer (LMML)
-   Single source of truth. main.js renders everything from here:
-     · LOCATIONS  — 13 real Roman sites, uniform metadata + the
-                    multimedia text grid (depth × audience = 9 texts)
-     · THEMES     — 4 switchable typographic/graphic themes
-     · DEPTHS / AUDIENCES — the two axes of the multimedia grid
-     · NARRATIVES — 3 guided visit routes
-     · ERAS       — the required historical timeline
-   ============================================================ */
 
-/* ---- the multimedia grid axes ---- */
 const DEPTHS = [
     { id: 'brief',  label: 'Brief',    note: 'A single caption' },
     { id: 'medium', label: 'Medium',   note: 'A short read' },
@@ -22,7 +11,7 @@ const AUDIENCES = [
     { id: 'scholar', label: 'Scholar', note: 'Specialist · advanced' }
 ];
 
-/* ---- switchable graphic / typographic themes ---- */
+
 const THEMES = [
     { id: 'notte',    label: 'Notte dorata', note: 'Gold on Roman night' },
     { id: 'carta',    label: 'Carta',        note: 'Exhibition print, on paper' },
@@ -30,7 +19,7 @@ const THEMES = [
     { id: 'affresco', label: 'Affresco',     note: 'Warm baroque fresco' }
 ];
 
-/* ---- the 13 locations, in one-day itinerary order ---- */
+
 const LOCATIONS = [
     {
         id: 'loc1', n: 1,
@@ -553,7 +542,7 @@ const NARRATIVES_GUIDED = [
     }
 ];
 
-/* ---- the required historical timeline ---- */
+
 const ERAS = [
     { id: 'ancient',        label: 'Ancient Rome',        span: 'I–III century',   locations: ['loc9','loc7'] },
     { id: 'early-christian',label: 'Early Christian Rome',span: 'V century',       locations: ['loc6'] },

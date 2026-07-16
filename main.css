@@ -1,25 +1,4 @@
-/* ============================================================
-   LA GRANDE BELLEZZA — Paolo Sorrentino
-   A single-experience "labyrinth" site.
-   Order of this stylesheet:
-     1. Reset & design tokens
-     2. Typography helpers
-     3. Navbar (dark strip + colosseum logo)
-     4. Burger / side menu (the labyrinth)
-     5. Step indicator
-     6. Buttons
-     7. Screen system & transitions
-     8. Screen 1 — Home (hero + quote)
-     9. Screen 2 — Intro (crack / glass shatter)
-    10. Location screens
-    11. City map
-    12. Modals (About / Documentation)
-    13. Footer
-    14. Reveal-on-view + misc
-    15. Responsive
-   ============================================================ */
 
-/* ---------- 1. Reset & design tokens ---------- */
 *,
 *::before,
 *::after {
@@ -70,7 +49,7 @@ a {
     text-decoration: none;
 }
 
-/* ---------- 2. Typography helpers ---------- */
+
 .kicker {
     font-family: var(--mono);
     text-transform: uppercase;
@@ -84,9 +63,7 @@ a {
     font-family: var(--serif);
 }
 
-/* ============================================================
-   3. NAVBAR — dark strip, links left, colosseum logo right
-   ============================================================ */
+
 .navbar {
     position: fixed;
     top: 0;
@@ -162,9 +139,7 @@ align-items: center;
     filter: drop-shadow(0 4px 16px rgba(254, 204, 42, 0.35));
 }
 
-/* ============================================================
-   4. BURGER / SIDE MENU — the labyrinth
-   ============================================================ */
+
 .menu-btn {
     position: fixed;
     top: 0;
@@ -285,9 +260,7 @@ body.menu-open .side-scrim {
     visibility: visible;
 }
 
-/* ============================================================
-   5. STEP INDICATOR — "where in the labyrinth am I"
-   ============================================================ */
+
 .step-indicator {
     position: fixed;
     left: 50%;
@@ -312,7 +285,7 @@ body.menu-open .side-scrim {
     transform: translateX(-50%) translateY(0);
 }
 
-/* tuck the pill away when the footer is reached */
+
 .step-indicator.near-footer {
     opacity: 0;
     transform: translateX(-50%) translateY(20px);
@@ -346,9 +319,7 @@ body.menu-open .side-scrim {
     white-space: nowrap;
 }
 
-/* ============================================================
-   6. BUTTONS
-   ============================================================ */
+
 .btn {
     --c: var(--gold);
     font-family: var(--mono);
@@ -399,9 +370,7 @@ body.menu-open .side-scrim {
     --c: var(--blue);
 }
 
-/* ============================================================
-   7. SCREEN SYSTEM & TRANSITIONS
-   ============================================================ */
+
 .screen {
     display: none;
     min-height: 100vh;
@@ -426,9 +395,7 @@ body.menu-open .side-scrim {
     }
 }
 
-/* ============================================================
-   8. SCREEN 1 — HOME (hero + quote)
-   ============================================================ */
+
 .hero {
     min-height: 100vh;
     display: flex;
@@ -515,9 +482,7 @@ body.menu-open .side-scrim {
     100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
 }
 
-/* ============================================================
-   9. SCREEN 2 — INTRO (crack / glass shatter)
-   ============================================================ */
+
 #intro {
     overflow: hidden;
 }
@@ -578,7 +543,7 @@ body.menu-open .side-scrim {
     opacity: 1;
 }
 
-/* once we land on the intact "after" screen, cracks dissolve away */
+
 .crack-stage.healed .crack-svg {
     opacity: 0;
 }
@@ -624,7 +589,7 @@ body.menu-open .side-scrim {
     animation: shake 0.55s ease;
 }
 
-/* both texts share one centered grid cell so the stage never clips */
+
 .stage-inner {
     position: relative;
     z-index: 10;
@@ -685,7 +650,7 @@ body.menu-open .side-scrim {
     max-width: 820px;
 }
 
-/* the minimalist hammer button */
+
 .hammer-btn {
     --c: var(--gold);
     position: relative;
@@ -763,9 +728,7 @@ body.menu-open .side-scrim {
     font-family: var(--body);
 }
 
-/* ============================================================
-   10. LOCATION SCREENS
-   ============================================================ */
+
 .location {
     padding: calc(var(--nav-h) + 40px) 0 0;
 }
@@ -869,7 +832,7 @@ body.menu-open .side-scrim {
     color: var(--gold);
 }
 
-/* secondary image(s) for locations that have a pair */
+
 .loc-gallery {
     display: grid;
     gap: 18px;
@@ -912,7 +875,7 @@ body.menu-open .side-scrim {
     width: 100%;
 }
 
-/* ===== About this location · metadata table ===== */
+
 .loc-about {
     border-top: 1px solid var(--line);
     padding-top: clamp(40px, 6vw, 64px);
@@ -991,7 +954,7 @@ body.menu-open .side-scrim {
     .meta-table td.meta-prop { width: 44%; font-size: 0.74rem; }
 }
 
-/* prev / next labyrinth navigation */
+
 .loc-nav {
     border-top: 1px solid var(--line);
     display: grid;
@@ -1037,9 +1000,7 @@ body.menu-open .side-scrim {
     color: var(--gold);
 }
 
-/* ============================================================
-   11. CITY MAP
-   ============================================================ */
+
 #citymap {
     padding: calc(var(--nav-h) + 70px) clamp(24px, 7vw, 80px) 90px;
 }
@@ -1123,7 +1084,7 @@ body.menu-open .side-scrim {
     color: var(--ink);
 }
 
-/* ---------- Interactive Rome map (Leaflet) ---------- */
+
 .rome-map-frame {
     max-width: 1200px;
     margin: 0 auto 56px;
@@ -1147,7 +1108,7 @@ body.menu-open .side-scrim {
     padding: 14px 10px 6px;
 }
 
-/* keep our global img rule from breaking Leaflet tiles */
+
 .leaflet-container img.leaflet-tile,
 .leaflet-container .leaflet-pane img {
     max-width: none !important;
@@ -1158,7 +1119,7 @@ body.menu-open .side-scrim {
     font-family: var(--body);
 }
 
-/* gold numbered markers */
+
 .rome-marker {
     background: transparent;
     border: 0;
@@ -1186,7 +1147,7 @@ body.menu-open .side-scrim {
     box-shadow: 0 0 0 7px rgba(254, 204, 42, 0.28), 0 6px 18px rgba(0, 0, 0, 0.6);
 }
 
-/* the little hover card (Leaflet tooltip) */
+
 .leaflet-tooltip.rome-tip {
     background: #0b0a0e;
     border: 1px solid var(--gold);
@@ -1228,7 +1189,7 @@ body.menu-open .side-scrim {
     margin-right: 7px;
 }
 
-/* dark zoom + attribution controls */
+
 .leaflet-bar a,
 .leaflet-bar a:hover {
     background: #0b0a0e;
@@ -1250,10 +1211,7 @@ body.menu-open .side-scrim {
     color: var(--muted) !important;
 }
 
-/* ============================================================
-   11b. NARRATIVES — reading Rome by theme, type & century
-   ============================================================ */
-/* ---------- Team ---------- */
+
 .team {
     padding: calc(var(--nav-h) + 70px) clamp(24px, 7vw, 80px) 90px;
 }
@@ -1358,7 +1316,7 @@ body.menu-open .side-scrim {
     line-height: 1.6;
 }
 
-/* each "lens" is one way of reading the locations */
+
 .lens {
     max-width: 1080px;
     margin: 0 auto;
@@ -1494,9 +1452,7 @@ body.menu-open .side-scrim {
     margin-bottom: 12px;
 }
 
-/* ============================================================
-   11c. CHOOSE YOUR FIGHTER — character graph + quiz
-   ============================================================ */
+
 .fighter {
     padding: calc(var(--nav-h) + 70px) clamp(24px, 7vw, 80px) 90px;
 }
@@ -1520,7 +1476,7 @@ body.menu-open .side-scrim {
     line-height: 1.6;
 }
 
-/* --- the constellation + detail panel --- */
+
 .fighter-graph {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1607,7 +1563,7 @@ body.menu-open .side-scrim {
     white-space: nowrap;
 }
 
-/* detail panel */
+
 .char-detail {
     min-height: 240px;
 }
@@ -1693,7 +1649,7 @@ body.menu-open .side-scrim {
     to { opacity: 1; transform: none; }
 }
 
-/* --- the quiz --- */
+
 .quiz {
     max-width: 860px;
     margin: 0 auto;
@@ -1815,7 +1771,7 @@ body.menu-open .side-scrim {
     color: var(--muted);
 }
 
-/* result card */
+
 .quiz-result {
     margin-top: 50px;
     border: 1px solid var(--gold);
@@ -1872,9 +1828,7 @@ body.menu-open .side-scrim {
     --c: var(--muted);
 }
 
-/* ============================================================
-   12. MODALS (About / Documentation)
-   ============================================================ */
+
 .modal {
     position: fixed;
     inset: 0;
@@ -1948,9 +1902,7 @@ body.menu-open .side-scrim {
     color: var(--gold);
 }
 
-/* ============================================================
-   13. FOOTER
-   ============================================================ */
+
 .site-footer {
     border-top: 1px solid var(--line);
     padding: 48px clamp(24px, 7vw, 80px);
@@ -1977,9 +1929,7 @@ body.menu-open .side-scrim {
     color: var(--muted);
 }
 
-/* ============================================================
-   14. REVEAL-ON-VIEW + misc
-   ============================================================ */
+
 .reveal {
     opacity: 0;
     transform: translateY(28px);
@@ -1991,7 +1941,7 @@ body.menu-open .side-scrim {
     transform: none;
 }
 
-/* tiny scroll progress bar at very top */
+
 .progress {
     position: fixed;
     top: 0;
@@ -2003,9 +1953,7 @@ body.menu-open .side-scrim {
     transition: width 0.1s linear;
 }
 
-/* ============================================================
-   15. RESPONSIVE
-   ============================================================ */
+
 @media (max-width: 760px) {
     :root {
         --nav-h: 100px;
@@ -2068,9 +2016,7 @@ body.menu-open .side-scrim {
     }
 }
 
-/* ============================================================
-   16. THEME SWITCHER (navbar)
-   ============================================================ */
+
 .nav-links { gap: 26px; }
 .nav-links a, .nav-links button { font-size: 0.82rem; letter-spacing: 0.16em; }
 
@@ -2131,9 +2077,7 @@ body.menu-open .side-scrim {
 .ts-cinema   { background: #e7e7e7; }
 .ts-affresco { background: #e0a13c; }
 
-/* ============================================================
-   17. TEXT CONTROLS (multimedia grid: depth × audience)
-   ============================================================ */
+
 .text-controls {
     display: flex;
     flex-wrap: wrap;
@@ -2160,9 +2104,7 @@ body.menu-open .side-scrim {
 .tc-btn:hover { border-color: var(--gold); color: var(--gold); }
 .tc-btn.on { background: var(--gold); border-color: var(--gold); color: #08070a; }
 
-/* ============================================================
-   18. NARRATIVE CARDS (guided routes)
-   ============================================================ */
+
 .narr-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -2188,9 +2130,7 @@ body.menu-open .side-scrim {
 .btn-ghost { background: none; border: 1px solid var(--gold); color: var(--gold); }
 .lens-note { color: var(--muted); font-size: 1.05rem; line-height: 1.6; margin-bottom: 18px; max-width: 640px; }
 
-/* ============================================================
-   19. HISTORICAL TIMELINE
-   ============================================================ */
+
 .timeline { padding: calc(var(--nav-h) + 70px) clamp(24px, 7vw, 80px) 90px; }
 .timeline-track {
     max-width: 980px;
@@ -2221,9 +2161,7 @@ body.menu-open .side-scrim {
 .era-loc-cap { font-family: var(--body); font-size: 1.02rem; color: var(--ink); line-height: 1.2; }
 .era-loc-cap b { font-family: var(--mono); font-size: 0.66rem; color: var(--gold); margin-right: 6px; }
 
-/* ============================================================
-   20. MAP LAYOUT + ONE-DAY ITINERARY
-   ============================================================ */
+
 .map-layout {
     display: grid;
     grid-template-columns: 1.55fr 1fr;
@@ -2250,9 +2188,7 @@ body.menu-open .side-scrim {
     .itinerary { max-height: none; }
 }
 
-/* ============================================================
-   21. META PAGES (About / Documentation / Disclaimer)
-   ============================================================ */
+
 .meta-page { padding: calc(var(--nav-h) + 60px) 0 0; }
 .meta-wrap { max-width: 820px; margin: 0 auto; padding: 0 clamp(24px, 7vw, 60px) 0; }
 .meta-wrap > h2 { font-family: var(--serif); font-size: clamp(2rem, 4.5vw, 3.4rem); color: var(--ink); margin: 14px 0 30px; }
@@ -2277,9 +2213,7 @@ body.menu-open .side-scrim {
 .meta-nav .dir { display: block; font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
 .meta-nav .dest { font-family: var(--serif); font-size: 1.4rem; color: var(--ink); }
 
-/* ============================================================
-   22. SIDE MENU SCROLL + FOOTER LINKS
-   ============================================================ */
+
 .menu-label-2 { padding-top: 26px !important; }
 .f-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; margin-top: 18px; }
 .f-links button {
@@ -2289,10 +2223,7 @@ body.menu-open .side-scrim {
 }
 .f-links button:hover { color: var(--gold); }
 
-/* ============================================================
-   23. THEMES — switchable graphic / typographic identities
-   ============================================================ */
-/* default (notte) lives in :root. */
+
 
 [data-theme="carta"] {
     --bg: #f4f1ea;
@@ -2356,9 +2287,7 @@ body.menu-open .side-scrim {
 }
 [data-theme="affresco"] .tc-btn.on { color: #201409; }
 
-/* ============================================================
-   24. RESPONSIVE — navbar collapses to burger on small screens
-   ============================================================ */
+
 @media (max-width: 720px) {
     /* the side menu (burger) is the primary navigation on mobile;
        keep only Home and the theme switcher in the top bar. */

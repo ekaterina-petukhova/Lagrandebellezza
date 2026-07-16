@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Serif+Display:ital@0;1&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Space+Grotesk:wght@400;500;700&family=Spectral:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
-    <!-- Leaflet — interactive map of Rome on the City map screen -->
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -16,10 +16,10 @@
 </head>
 <body class="site">
 
-    <!-- scroll progress -->
+    
     <div class="progress" id="progress"></div>
 
-    <!-- ============ NAVBAR (dark strip) ============ -->
+    
     <button class="menu-btn" id="menuBtn" aria-label="Open the labyrinth">
         <span></span><span></span><span></span>
     </button>
@@ -41,7 +41,7 @@
             <li><button class="nav-team" data-go="team">Team</button></li>
            
 
-            <!-- theme switcher -->
+            
             <li class="theme-switch">
                 <button class="theme-toggle" id="themeToggle" aria-haspopup="true" title="Switch the theme">
                     <span class="theme-swatch" aria-hidden="true"></span>
@@ -61,7 +61,7 @@
         </a>
     </nav>
 
-    <!-- ============ SIDE MENU (the labyrinth) ============ -->
+    
     <aside class="side-menu" id="sideMenu">
         <p class="menu-label">The labyrinth · thirteen passages</p>
         <div class="side-menu-scroll">
@@ -73,7 +73,7 @@
     </aside>
     <div class="side-scrim" id="sideScrim"></div>
 
-    <!-- ============ STEP INDICATOR ============ -->
+    
     <div class="step-indicator" id="stepIndicator">
         <div class="dots" id="stepDots"></div>
         <span class="label" id="stepLabel"></span>
@@ -81,7 +81,7 @@
 
     <main>
 
-        <!-- ===== SCREEN 1 — HOME ===== -->
+        
         <section class="screen active" id="home">
             <div class="hero">
                 <div class="overlay"></div>
@@ -101,7 +101,7 @@
             </div>
         </section>
 
-        <!-- ===== SCREEN 2 — INTRO (crack / glass shatter) ===== -->
+        
         <section class="screen" id="intro">
             <div class="crack-stage" id="crackStage">
                 <div class="stage-bg before"></div>
@@ -110,7 +110,7 @@
                 <div class="flash" id="flash"></div>
 
                 <div class="stage-inner">
-                <!-- before the shatter -->
+                
                 <div class="stage-content before-content">
                     <p class="kicker">Beauty on the surface</p>
                     <blockquote class="intro-quote">
@@ -127,7 +127,7 @@
                     </button>
                 </div>
 
-                <!-- after the shatter (intact screen) -->
+                
                 <div class="stage-content after-content">
                     <p class="kicker">Beneath the shell</p>
                     <blockquote class="intro-quote">
@@ -141,10 +141,10 @@
             </div>
         </section>
 
-        <!-- ===== LOCATIONS 01–13 (rendered from data.js) ===== -->
+        
         <div id="locationScreens"></div>
 
-        <!-- ===== NARRATIVES ===== -->
+        
         <section class="screen narratives" id="narratives">
             <div class="narr-head">
                 <p class="kicker reveal">Narratives</p>
@@ -152,14 +152,14 @@
                 <p class="reveal">Choose a guided route through the film's Rome, or follow a single thread — a theme or a kind of place — back to the locations it touches.</p>
             </div>
 
-            <!-- Guided visit narratives -->
+            
             <section class="lens">
                 <p class="lens-kicker reveal">Guided routes</p>
                 <h3 class="lens-title reveal">Pick a narrative and follow it, stop by stop</h3>
                 <div class="narr-cards" id="guidedNarr"></div>
             </section>
 
-            <!-- Lens · Themes -->
+            
             <section class="lens lens--theme">
                 <p class="lens-kicker reveal">Lens 01 · Themes</p>
                 <h3 class="lens-title reveal">Explore the themes that run through Rome and the film</h3>
@@ -173,7 +173,7 @@
                 </div>
             </section>
 
-            <!-- Lens · Typology -->
+            
             <section class="lens lens--type">
                 <p class="lens-kicker reveal">Lens 02 · Typology</p>
                 <h3 class="lens-title reveal">Discover the different typologies of Roman places</h3>
@@ -187,7 +187,7 @@
                 </div>
             </section>
 
-            <!-- Lens · Centuries -> the timeline page -->
+            
             <section class="lens lens--period">
                 <p class="lens-kicker reveal">Lens 03 · Through the centuries</p>
                 <h3 class="lens-title reveal">Six ages built these places</h3>
@@ -196,7 +196,7 @@
             </section>
         </section>
 
-        <!-- ===== HISTORICAL TIMELINE ===== -->
+        
         <section class="screen timeline" id="timeline">
             <div class="map-head">
                 <p class="kicker reveal">The required thread</p>
@@ -206,7 +206,7 @@
             <div class="timeline-track" id="timelineTrack"></div>
         </section>
 
-        <!-- ===== CITY MAP & ONE-DAY ITINERARY ===== -->
+        
         <section class="screen" id="citymap">
             <div class="map-head">
                 <p class="kicker reveal">The labyrinth, unfolded</p>
@@ -223,7 +223,7 @@
             </div>
         </section>
 
-        <!-- ===== CHOOSE YOUR FIGHTER ===== -->
+        
         <section class="screen fighter" id="fighter">
             <div class="fighter-head">
                 <p class="kicker reveal">Choose your fighter</p>
@@ -232,7 +232,7 @@
             </div>
 
             <div class="fighter-graph reveal">
-                <!-- the constellation -->
+                
                 <div class="constellation">
                     <svg class="constellation-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                         <line x1="50" y1="50" x2="50" y2="14"></line>
@@ -278,11 +278,11 @@
                     </button>
                 </div>
 
-                <!-- the detail panel (filled by main.js) -->
+                
                 <div class="char-detail" id="charDetail"></div>
             </div>
 
-            <!-- the quiz -->
+            
             <div class="quiz">
                 <div class="quiz-head">
                     <p class="kicker reveal">The quiz</p>
@@ -298,7 +298,7 @@
             </div>
         </section>
 
-        <!-- ===== TEAM ===== -->
+       
         <section class="screen team" id="team">
             <div class="team-head">
                 <p class="kicker reveal">The team</p>
@@ -331,7 +331,7 @@
             </div>
         </section>
 
-        <!-- ===== ABOUT ===== -->
+        
         <section class="screen meta-page" id="about">
             <div class="meta-wrap">
                 <p class="kicker reveal">About</p>
@@ -349,7 +349,7 @@
             </div>
         </section>
 
-        <!-- ===== DOCUMENTATION ===== -->
+        
         <section class="screen meta-page" id="documentation">
             <div class="meta-wrap">
                 <p class="kicker reveal">Documentation</p>
@@ -382,7 +382,7 @@
             </div>
         </section>
 
-        <!-- ===== DISCLAIMER ===== -->
+        
         <section class="screen meta-page" id="disclaimer">
             <div class="meta-wrap">
                 <p class="kicker reveal">Disclaimer</p>
@@ -402,7 +402,7 @@
 
     </main>
 
-    <!-- ============ FOOTER ============ -->
+    
     <footer class="site-footer">
         <div class="f-title">La Grande Bellezza</div>
         <div class="f-meta">Paolo Sorrentino · 2013 · A labyrinth of Rome</div>
@@ -414,7 +414,7 @@
         </nav>
     </footer>
 
-    <!-- narrative modal (content filled by main.js) -->
+    
     <div class="modal" id="modal-narrative">
         <div class="modal-scrim" data-close></div>
         <div class="modal-box">

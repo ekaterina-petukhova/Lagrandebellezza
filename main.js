@@ -1,10 +1,4 @@
-/* ============================================================
-   LA GRANDE BELLEZZA — interaction layer (LMML)
-   Locations, metadata, narratives, timeline and the multimedia
-   text grid all come from data.js; this file renders and wires them.
-   ============================================================ */
 
-/* ---------- 1. Boot / derived constants ---------- */
 const LOCATION_IDS = LOCATIONS.map(l => l.id);
 const META_AFTER = ['narratives', 'timeline', 'citymap', 'fighter', 'team', 'about', 'documentation', 'disclaimer'];
 const SCREENS = ['home', 'intro', ...LOCATION_IDS, ...META_AFTER];
@@ -14,11 +8,10 @@ const ROME_PLACES = LOCATIONS.map(l => ({
     id: l.id, n: l.n, name: l.title, img: l.img.hero, lat: l.coords.lat, lng: l.coords.lng
 }));
 
-/* encode image paths that contain spaces */
+
 const enc = p => encodeURI(p);
 
-/* thematic "lens" prose; the locations themselves are computed from
-   each place's tags in data.js, so this never falls out of sync. */
+
 const LENS_PROSE = {
     'beauty-surface':  { lens: 'Theme', title: 'Beauty on the surface', text: 'The film revels in the glittering shell of Rome — the parties, the gloss, the flawlessness of emptiness. Here beauty does not conceal meaning; it replaces it.' },
     'sacred-spiritual':{ lens: 'Theme', title: 'The sacred & the spiritual', text: 'Beneath the noise, Jep is searching for something he has lost. Rome’s churches, gardens and hidden views hold the spiritual thread the film keeps quietly reaching for.' },
@@ -37,7 +30,7 @@ const locationsByTag = key => LOCATIONS
     .filter(l => l.tags.themes.includes(key) || l.tags.typology.includes(key))
     .map(l => l.id);
 
-/* ---------- multimedia-grid state (depth × audience) ---------- */
+
 let textDepth = localStorage.getItem('lgb-depth') || 'medium';
 let textAud   = localStorage.getItem('lgb-aud')   || 'adult';
 
@@ -67,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen(SCREENS.includes(start) ? start : 'home', true);
 });
 
-/* ---------- 2. Screen router ---------- */
+
 function showScreen(id, instant) {
     if (!SCREENS.includes(id)) id = 'home';
 
@@ -114,7 +107,7 @@ function initRouter() {
     });
 }
 
-/* ---------- 3. Step indicator ---------- */
+
 function buildStepDots() {
     const wrap = document.getElementById('stepDots');
     wrap.innerHTML = LOCATIONS.map(() => '<span class="dot"></span>').join('');
@@ -135,7 +128,7 @@ function updateStepIndicator(screenEl) {
         String(idx).padStart(2, '0') + ' / ' + total + ' · ' + screenEl.dataset.name;
 }
 
-/* ---------- 4. Side menu ---------- */
+
 function initSideMenu() {
     document.getElementById('menuBtn').addEventListener('click', toggleMenu);
     document.getElementById('sideScrim').addEventListener('click', closeMenu);
@@ -158,7 +151,7 @@ function syncMenuActive(id) {
     });
 }
 
-/* ---------- 5. Modals ---------- */
+
 function initModals() {
     document.querySelectorAll('[data-modal]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -172,7 +165,7 @@ function closeModals() {
     document.querySelectorAll('.modal.open').forEach(m => m.classList.remove('open'));
 }
 
-/* ---------- 6. Themes (switchable graphic / typographic) ---------- */
+
 function initThemes() {
     const saved = localStorage.getItem('lgb-theme') || 'notte';
     applyTheme(saved);
@@ -204,7 +197,7 @@ function applyTheme(id) {
 }
 const accentColor = () => getComputedStyle(document.documentElement).getPropertyValue('--gold').trim() || '#fecc2a';
 
-/* ---------- 7. Locations: render from data ---------- */
+
 function renderLocations() {
     const host = document.getElementById('locationScreens');
     host.innerHTML = LOCATIONS.map((loc, i) => locationSectionHTML(loc, i)).join('');
@@ -287,7 +280,7 @@ function locationSectionHTML(loc, i) {
     </section>`;
 }
 
-/* ---------- 7b. The multimedia text grid (depth × audience) ---------- */
+
 function initTextControls() {
     document.body.addEventListener('click', e => {
         const d = e.target.closest('[data-depth]');
@@ -310,7 +303,7 @@ function syncTextControls() {
     document.querySelectorAll('[data-aud]').forEach(b => b.classList.toggle('on', b.dataset.aud === textAud));
 }
 
-/* ---------- 8. Narratives: guided routes + thematic lenses ---------- */
+
 function renderNarratives() {
     const wrap = document.getElementById('guidedNarr');
     if (wrap) {
@@ -364,7 +357,7 @@ function openGuided(id) {
     document.getElementById('modal-narrative').classList.add('open');
 }
 
-/* ---------- 8b. Historical timeline ---------- */
+
 function renderTimeline() {
     const wrap = document.getElementById('timelineTrack');
     if (!wrap) return;
@@ -387,7 +380,7 @@ function renderTimeline() {
         </div>`).join('');
 }
 
-/* ---------- 8c. One-day itinerary list (next to the map) ---------- */
+
 function renderItinerary() {
     const wrap = document.getElementById('itineraryList');
     if (!wrap) return;
@@ -403,7 +396,7 @@ function renderItinerary() {
         </li>`).join('');
 }
 
-/* ---------- 9. Choose your fighter — character graph ---------- */
+
 const CHARACTERS = {
     jep: {
         name: 'Jep Gambardella',
@@ -567,7 +560,7 @@ function showCharacter(key) {
     panel.classList.add('swap');
 }
 
-/* ---------- 9b. The quiz ---------- */
+
 const QUIZ = [
     {
         q: 'How do you usually behave at large social events or parties?',
@@ -706,7 +699,7 @@ function resetQuiz() {
     document.querySelector('.quiz-head').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-/* ---------- 10. The crack / glass-shatter experience ---------- */
+
 function initCrackExperience() {
     const stage = document.getElementById('crackStage');
     const btn = document.getElementById('hammerBtn');
@@ -787,7 +780,7 @@ function drawCracks(svg) {
     });
 }
 
-/* ---------- 11. Glass-break sound (synthesized) ---------- */
+
 let audioCtx = null;
 function playGlassBreak() {
     try {
@@ -822,7 +815,7 @@ function playGlassBreak() {
     } catch (e) { /* audio is a nicety */ }
 }
 
-/* ---------- 12. Scroll reveals + progress ---------- */
+
 let revealObserver;
 function initReveals() {
     revealObserver = new IntersectionObserver(entries => {
@@ -857,7 +850,7 @@ function initFooterWatch() {
     }, { threshold: 0 }).observe(footer);
 }
 
-/* ---------- 13. Interactive Rome map + one-day route ---------- */
+
 let romeMap = null;
 let routeLine = null;
 function initRomeMap() {
@@ -871,7 +864,7 @@ function initRomeMap() {
         attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
     }).addTo(romeMap);
 
-    // the one-day itinerary, drawn as an ordered route
+    
     routeLine = L.polyline(ROME_PLACES.map(p => [p.lat, p.lng]), {
         color: accentColor(), weight: 2.5, opacity: 0.65, dashArray: '1 9', lineCap: 'round'
     }).addTo(romeMap);
@@ -900,7 +893,7 @@ function initRomeMap() {
     });
 }
 
-/* ---------- 14. Parallax on location images ---------- */
+
 function initParallax() {
     let ticking = false;
     const update = () => {
